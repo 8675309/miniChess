@@ -74,16 +74,16 @@ void states::scan(int x, int y, move *moves, int &movesIndex, int dx, int dy, in
     while(inBounds(toX + dx, toY + dy)){
          //if square is empty 0 or contains opponent 1
 	if(checkEmpty(toX + dx, toY + dy,color) == 0 || checkEmpty(toX + dx, toY + dy,color) == 1 ){
-	  cout << "line 73 "  << " cE " << checkEmpty(toX + dx, toY + dy,color) << '\n'; 
+//	  cout << "line 73 "  << " cE " << checkEmpty(toX + dx, toY + dy,color) << '\n'; 
 	    moves[movesIndex].fromSquare.x = x; // new move(x, y, toX + dx, toY + dy);
 	    moves[movesIndex].fromSquare.y = y; 
 	    moves[movesIndex].toSquare.x = toX + dx; 
 	    moves[movesIndex].toSquare.y = toY + dy;
 	    //if an opponents piece is on the square or we are collecting single moves
 	    if(checkEmpty(toX + dx, toY + dy,color) == 1 || movement == single){
-		cout << "line 79 movement " << movement << " cE " << checkEmpty(toX + dx, toY + dy,color)<< '\n'; 
+//		cout << "line 79 movement " << movement << " cE " << checkEmpty(toX + dx, toY + dy,color)<< '\n'; 
 		++movesIndex;
-                cout << "line 81 movesIndex " << movesIndex << '\n';
+  //              cout << "line 81 movesIndex " << movesIndex << '\n';
            
 		break;
             }
@@ -91,7 +91,7 @@ void states::scan(int x, int y, move *moves, int &movesIndex, int dx, int dy, in
 	        toX = toX + dx;
                 toY = toY + dy;
 		++movesIndex;
-                cout << "line 86 movesIndex " << movesIndex << '\n';
+  //              cout << "line 86 movesIndex " << movesIndex << '\n';
 	    }
         }
 	else{   //self is on the square
@@ -145,17 +145,17 @@ void states::knightMoves(int x, int y, move *moves, int &movesIndex, char color)
 }
 
 void states::wPawnMoves(int x, int y, move *moves, int &movesIndex){
-    scan(x, y, moves, movesIndex, -1, 0, single, 'W'); //north
+    scan(x, y, moves, movesIndex, 1, 0, single, 'W'); //north
     //check for diagonal attack NW NE
-    pawnAttacks(x, y, moves, movesIndex, -1, -1, 'W');
-    pawnAttacks(x, y, moves, movesIndex, -1, 1, 'W');
+    pawnAttacks(x, y, moves, movesIndex, 1, -1, 'W');
+    pawnAttacks(x, y, moves, movesIndex, 1, 1, 'W');
 }
 
 void states::bPawnMoves(int x, int y, move *moves, int &movesIndex){
-    scan(x, y, moves, movesIndex, 1, 0, single, 'B'); //south
+    scan(x, y, moves, movesIndex, -1, 0, single, 'B'); //south
     //check for diagonal attack SW SE
-    pawnAttacks(x, y, moves, movesIndex, 1, -1, 'B');
-    pawnAttacks(x, y, moves, movesIndex, 1, 1, 'B');
+    pawnAttacks(x, y, moves, movesIndex, -1, -1, 'B');
+    pawnAttacks(x, y, moves, movesIndex, -1, 1, 'B');
 }
 
 void states::pawnAttacks(int x, int y, move *moves, int &movesIndex, int dx, int dy, char color){
@@ -177,7 +177,7 @@ int states::moveGen(char color, move *moves){
     square pieces[10];
     //k = number of slots filled in pieces array
     int k = findPieces(color,pieces);
-    cout << "171 k " << k << '\n';
+    cout << "180 k " << k << '\n';
     for(int i = 0; i < k; ++i){
     switch(board[pieces[i].x][pieces[i].y]){
 	case 'k':
