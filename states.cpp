@@ -74,16 +74,16 @@ void states::scan(int x, int y, move *moves, int &movesIndex, int dx, int dy, in
     while(inBounds(toX + dx, toY + dy)){
          //if square is empty 0 or contains opponent 1
 	if(checkEmpty(toX + dx, toY + dy,color) == 0 || checkEmpty(toX + dx, toY + dy,color) == 1 ){
-//	  cout << "line 73 "  << " cE " << checkEmpty(toX + dx, toY + dy,color) << '\n'; 
+//	  cout << "line 77 "  << " cE " << checkEmpty(toX + dx, toY + dy,color) << '\n'; 
 	    moves[movesIndex].fromSquare.x = x; // new move(x, y, toX + dx, toY + dy);
 	    moves[movesIndex].fromSquare.y = y; 
 	    moves[movesIndex].toSquare.x = toX + dx; 
 	    moves[movesIndex].toSquare.y = toY + dy;
 	    //if an opponents piece is on the square or we are collecting single moves
 	    if(checkEmpty(toX + dx, toY + dy,color) == 1 || movement == single){
-//		cout << "line 79 movement " << movement << " cE " << checkEmpty(toX + dx, toY + dy,color)<< '\n'; 
+//		cout << "line 84 movement " << movement << " cE " << checkEmpty(toX + dx, toY + dy,color)<< '\n'; 
 		++movesIndex;
-  //              cout << "line 81 movesIndex " << movesIndex << '\n';
+  //             cout << "line 86 movesIndex " << movesIndex << '\n';
            
 		break;
             }

@@ -20,7 +20,7 @@
   //set up git
   //checks to see if move passed to update board is valid
   bool validMove(move myMove, char piece, char color){
-      int movesIndex;
+      int movesIndex = 0;
       move moves[30];
       if(colorMatch(myMove,piece,color)){
           int myFromX = myMove.fromSquare.x;
@@ -105,11 +105,13 @@ int colorMatch(move myMove, char piece, char color){
 
 //generates random computer move
 void compMove(char color){
+    cout << "line 108 color: " << color << '\n';
     move moves[290];
     int i = state.moveGen(color, moves);
-    cout << "113 i " << i << '\n';
+  //  cout << "111 i " << i << '\n';
     if(i==0)
     {
+      cout << "in if 114 \n";
 	if(color == 'W')
 	       gameOver('B');
 	else
@@ -120,6 +122,7 @@ void compMove(char color){
     srand((unsigned int) seconds) ; 
     int random = rand() % i;
     move myMove = moves[random];
+   // cout << "line 125 \n";
     updateBoard(myMove, color);   
 }
 
