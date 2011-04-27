@@ -8,6 +8,8 @@ states::states(){
     count = 0;
 }
 
+//some stuff
+
 states::~states(){
 
 }
