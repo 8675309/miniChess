@@ -3,12 +3,12 @@
 #include "classes.h"
 #define single 1
 #define multiple 0
+int addPieces(int count,square *pieces);
+int eval(char color);
 states::states(){
     onMove = 'W';
     count = 0;
 }
-
-//some stuff
 
 states::~states(){
 
@@ -42,30 +42,85 @@ int states::checkEmpty(int x, int y, char color){
 	return 3; //error (very bad)
 }
 
+/*pass this an empty square array and a color, and it will fill 
+ the array with squares containing that color piece*/
 int states::findPieces(char color, square *pieces){
     int i,j,lower,upper;
     int k = 0;
     //square pieces[10];
     if(color == 'W'){
-	lower = 65; //ascii range for pieces
-	upper = 83; //upper case
+		lower = 65; //ascii range for pieces
+		upper = 83; //upper case
     }
     else if(color == 'B'){
-	lower = 97;
-	upper = 115;
+		lower = 97;
+		upper = 115;
     }
+    
     for(i=0; i<=5; ++i){
-	 for(j=0; j<=4; ++j){
-	    if(board[i][j] > lower && board[i][j] < upper){
-		    pieces[k].x = i;
-		    pieces[k].y = j;
-		    ++k;
-	    }
-	 }
+		for(j=0; j<=4; ++j){
+			if(board[i][j] > lower && board[i][j] < upper){
+				pieces[k].x = i;
+				pieces[k].y = j;
+				++k;
+			}
+		}
     }
     return k;
 }
 
+//pass this the color of the piece on-move
+int states::eval(char color){
+    square piecesB[10];
+    square piecesW[10];
+    int countB = findPieces('B',piecesB);
+    int countW = findPieces('W',piecesW);
+    int totalB, totalW;
+    totalB = addPieces(countB,piecesB);
+    totalW = addPieces(countW,piecesW);
+    int score;
+    if(color == 'W')
+	 score = totalW - totalB;
+    else
+	 score = totalB - totalW;
+    return score; 
+}
+
+int states::addPieces(int count,square *pieces){
+    int score = 0;
+    for(int i = 0; i <= count; ++i){
+		switch(board[pieces[i].x][pieces[i].y]){
+			case 'k':
+			case 'K':
+				score += 5000;
+				break;
+			case 'q':
+			case 'Q':
+				score += 900;
+				break;
+			case 'r':
+			case 'R':
+				score += 500;
+				break;
+			case 'b':
+			case 'B':
+				score += 300;
+				break;
+			case 'n':
+			case 'N':
+				score += 200;
+				break;
+			case 'p':
+			case 'P':
+				score += 100;
+				break;
+			default:
+				cout<< "non-valid piece in pieces[i], states.cpp";
+		}
+	}
+	return score;
+}
+	
 void states::scan(int x, int y, move *moves, int &movesIndex, int dx, int dy, int movement, char color){
     int toX = x;
     int toY = y;
@@ -74,24 +129,18 @@ void states::scan(int x, int y, move *moves, int &movesIndex, int dx, int dy, in
     while(inBounds(toX + dx, toY + dy)){
          //if square is empty 0 or contains opponent 1
 	if(checkEmpty(toX + dx, toY + dy,color) == 0 || checkEmpty(toX + dx, toY + dy,color) == 1 ){
-//	  cout << "line 77 "  << " cE " << checkEmpty(toX + dx, toY + dy,color) << '\n'; 
 	    moves[movesIndex].fromSquare.x = x; // new move(x, y, toX + dx, toY + dy);
 	    moves[movesIndex].fromSquare.y = y; 
 	    moves[movesIndex].toSquare.x = toX + dx; 
 	    moves[movesIndex].toSquare.y = toY + dy;
-	    //if an opponents piece is on the square or we are collecting single moves
 	    if(checkEmpty(toX + dx, toY + dy,color) == 1 || movement == single){
-//		cout << "line 84 movement " << movement << " cE " << checkEmpty(toX + dx, toY + dy,color)<< '\n'; 
 		++movesIndex;
-  //             cout << "line 86 movesIndex " << movesIndex << '\n';
-           
 		break;
             }
 	    else{ 
 	        toX = toX + dx;
                 toY = toY + dy;
 		++movesIndex;
-  //              cout << "line 86 movesIndex " << movesIndex << '\n';
 	    }
         }
 	else{   //self is on the square
