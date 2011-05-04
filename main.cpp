@@ -103,13 +103,48 @@ int colorMatch(move myMove, char piece, char color){
     return false;
 }
 
+
+void undoMove(move myMove,char color){
+    move reverse;
+    reverse.fromSquare.x = myMove.toSquare.x;
+    reverse.fromSquare.y = myMove.toSquare.y;
+    reverse.toSquare.x = myMove.fromSquare.x;
+    reverse.toSquare.y = myMove.fromSquare.y;
+    updateBoard(reverse, color);   
+}
+
+move chooseMove(move *moves, char onMove, int count){
+    char color;
+    int i;
+    move myMove;
+    if(onMove == 'W')
+	color = 'B';
+    else
+	color = 'W';
+
+    int bestScore = 10000;
+    int bestMove = 0;
+    int score;
+    for(i = 0; i < count; ++i){
+	updateBoard(moves[i],color);
+	score = state.eval(color);
+	if(score < bestScore){
+	    bestScore = score;
+	    bestMove = i;
+	}
+	undoMove(moves[i],color);
+    }
+    myMove = moves[i];
+    return myMove;
+}
+
 //generates random computer move
 void compMove(char color){
     cout << "line 108 color: " << color << '\n';
     move moves[290];
-    int i = state.moveGen(color, moves);
+    int count = state.moveGen(color, moves);
   //  cout << "111 i " << i << '\n';
-    if(i==0)
+    if(count==0)
     {
       cout << "in if 114 \n";
 	if(color == 'W')
@@ -117,14 +152,15 @@ void compMove(char color){
 	else
 	       gameOver('W');
     }
-    time_t seconds;
-    time(&seconds);
-    srand((unsigned int) seconds) ; 
-    int random = rand() % i;
-    move myMove = moves[random];
-   // cout << "line 125 \n";
+   // time_t seconds;
+   // time(&seconds);
+   // srand((unsigned int) seconds) ; 
+   // int random = rand() % i;
+   // move myMove = moves[random];
+    move myMove = chooseMove(moves,color,count);
     updateBoard(myMove, color);   
 }
+
 
 //chess coord char to matrix coord
 int transChar(char letter){
@@ -231,8 +267,10 @@ void createStart(){
 void compVsComp(){
   while(1){
     compMove('W');
+    state.eval('W');
     printBoard();
     compMove('B');
+    state.eval('B');
     printBoard();
   }
 }

@@ -69,7 +69,8 @@ int states::findPieces(char color, square *pieces){
     return k;
 }
 
-//pass this the color of the piece on-move
+/*pass this the color of the piece on-move
+  returns score for that color*/
 int states::eval(char color){
     square piecesB[10];
     square piecesW[10];
@@ -83,16 +84,18 @@ int states::eval(char color){
 	 score = totalW - totalB;
     else
 	 score = totalB - totalW;
+	cout<< "score " << score << '\n';
     return score; 
 }
 
 int states::addPieces(int count,square *pieces){
     int score = 0;
-    for(int i = 0; i <= count; ++i){
+//changed from <=...
+    for(int i = 0; i < count; ++i){
 		switch(board[pieces[i].x][pieces[i].y]){
 			case 'k':
 			case 'K':
-				score += 5000;
+				score += 10000;
 				break;
 			case 'q':
 			case 'Q':
@@ -115,7 +118,7 @@ int states::addPieces(int count,square *pieces){
 				score += 100;
 				break;
 			default:
-				cout<< "non-valid piece in pieces[i], states.cpp";
+				cout<< "120 non-valid piece in pieces[i], states.cpp \n";
 		}
 	}
 	return score;
@@ -124,8 +127,6 @@ int states::addPieces(int count,square *pieces){
 void states::scan(int x, int y, move *moves, int &movesIndex, int dx, int dy, int movement, char color){
     int toX = x;
     int toY = y;
-    //CHECK BOARD AT VARIOUS POINTS TO FIGURE OUT WHY CHECK EMPTY IS GIVING 1
-   //ALSO WRITE PRINT MOVE
     while(inBounds(toX + dx, toY + dy)){
          //if square is empty 0 or contains opponent 1
 	if(checkEmpty(toX + dx, toY + dy,color) == 0 || checkEmpty(toX + dx, toY + dy,color) == 1 ){
@@ -226,7 +227,6 @@ int states::moveGen(char color, move *moves){
     square pieces[10];
     //k = number of slots filled in pieces array
     int k = findPieces(color,pieces);
-    cout << "180 k " << k << '\n';
     for(int i = 0; i < k; ++i){
     switch(board[pieces[i].x][pieces[i].y]){
 	case 'k':
@@ -255,7 +255,7 @@ int states::moveGen(char color, move *moves){
 	    bPawnMoves(pieces[i].x, pieces[i].y, moves, movesIndex);
 	    break;
         default:
-	    cout<< "non-valid piece in pieces[i], states.cpp";
+	    cout<< "259 non-valid piece in pieces[i], states.cpp";
     }
 
     }
