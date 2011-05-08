@@ -23,25 +23,39 @@ int states::inBounds(int x, int y){
 
 //0 if coordinate square is empty 
 int states::checkEmpty(int x, int y, char color){
-    if(board[x][y] == 120)
+//cout << "\n check empty:\n" << color << '\n' <<" board " <<x <<" "<< y << " " <<  board[x][y] << '\n';
+
+    if(board[x][y] == 120){
+//        cout << "returning 0 for empty";
 	return 0; //empty
+    }
+
     else if(color == 'W'){
-	if(board[x][y] > 97 && board[x][y] < 115)
+	if(board[x][y] > 97 && board[x][y] < 115){
+  //          cout << "returning 1 for opp";
 	    return 1;  //opponent
-	else 
+        }
+	else{ 
+    //        cout << "returning 2 for self";
 	    return 2; //self
-    }
+         }
+
+   }
     else if(color == 'B'){
-	if(board[x][y] < 83 && board[x][y] > 65)
+	if(board[x][y] < 83 && board[x][y] > 65){
+  //          cout << "returning 1 for opp";
 	    return 1;
-	else 
+        }
+	else{ 
+    //        cout << "returning 2 for self";
 	    return 2;
+        }
     }
-    else 
+    else{ 
         cout << "line 39 states very bad";
 	return 3; //error (very bad)
+    }
 }
-
 /*pass this an empty square array and a color, and it will fill 
  the array with squares containing that color piece*/
 int states::findPieces(char color, square *pieces){
@@ -84,7 +98,7 @@ int states::eval(char color){
 	 score = totalW - totalB;
     else
 	 score = totalB - totalW;
-	cout<< "score " << score << '\n';
+//	cout<< "score " << score << '\n';
     return score; 
 }
 
@@ -129,16 +143,19 @@ void states::scan(int x, int y, move *moves, int &movesIndex, int dx, int dy, in
     int toY = y;
     while(inBounds(toX + dx, toY + dy)){
          //if square is empty 0 or contains opponent 1
-	if(checkEmpty(toX + dx, toY + dy,color) == 0 || checkEmpty(toX + dx, toY + dy,color) == 1 ){
+        int CE = checkEmpty(toX + dx, toY + dy,color); 
+	if(CE == 0 || CE == 1 ){
 	    moves[movesIndex].fromSquare.x = x; // new move(x, y, toX + dx, toY + dy);
 	    moves[movesIndex].fromSquare.y = y; 
 	    moves[movesIndex].toSquare.x = toX + dx; 
 	    moves[movesIndex].toSquare.y = toY + dy;
-	    if(checkEmpty(toX + dx, toY + dy,color) == 1 || movement == single){
+	    if(CE == 1 || movement == single){
+//cout<< "\nsingle or opponent break\n" ;
 		++movesIndex;
 		break;
             }
 	    else{ 
+//cout<< "\nsearch farther\n" ;
 	        toX = toX + dx;
                 toY = toY + dy;
 		++movesIndex;
@@ -193,19 +210,23 @@ void states::knightMoves(int x, int y, move *moves, int &movesIndex, char color)
     scan(x, y, moves, movesIndex, 2, 1, single,color); 
     scan(x, y, moves, movesIndex, 2, -1, single,color); 
 }
-
+//WHAT THE HELL??
 void states::wPawnMoves(int x, int y, move *moves, int &movesIndex){
-    scan(x, y, moves, movesIndex, 1, 0, single, 'W'); //north
+    if(inBounds(x-1, y) && checkEmpty(x-1, y,'W') == 0){
+       scan(x, y, moves, movesIndex, -1, 0, single, 'W'); //north
+    }
     //check for diagonal attack NW NE
-    pawnAttacks(x, y, moves, movesIndex, 1, -1, 'W');
-    pawnAttacks(x, y, moves, movesIndex, 1, 1, 'W');
+    pawnAttacks(x, y, moves, movesIndex, -1, -1, 'W');
+    pawnAttacks(x, y, moves, movesIndex, -1, 1, 'W');
 }
 
 void states::bPawnMoves(int x, int y, move *moves, int &movesIndex){
-    scan(x, y, moves, movesIndex, -1, 0, single, 'B'); //south
+    if(inBounds(x+1, y) && checkEmpty(x+1, y,'B') == 0){
+        scan(x, y, moves, movesIndex, 1, 0, single, 'B'); //south
+    }
     //check for diagonal attack SW SE
-    pawnAttacks(x, y, moves, movesIndex, -1, -1, 'B');
-    pawnAttacks(x, y, moves, movesIndex, -1, 1, 'B');
+    pawnAttacks(x, y, moves, movesIndex, 1, -1, 'B');
+    pawnAttacks(x, y, moves, movesIndex, 1, 1, 'B');
 }
 
 void states::pawnAttacks(int x, int y, move *moves, int &movesIndex, int dx, int dy, char color){
@@ -217,6 +238,7 @@ void states::pawnAttacks(int x, int y, move *moves, int &movesIndex, int dx, int
 	    moves[movesIndex].fromSquare.y = y; 
 	    moves[movesIndex].toSquare.x = x + dx; 
 	    moves[movesIndex].toSquare.y = y + dy;
+            ++movesIndex;
         }
     }
 }
@@ -249,9 +271,10 @@ int states::moveGen(char color, move *moves){
 	case 'N':
 	    knightMoves(pieces[i].x, pieces[i].y, moves, movesIndex, color);
 	    break;
-	case 'p':
-	    wPawnMoves(pieces[i].x, pieces[i].y, moves, movesIndex);
 	case 'P':
+	    wPawnMoves(pieces[i].x, pieces[i].y, moves, movesIndex);
+	    break;
+	case 'p':
 	    bPawnMoves(pieces[i].x, pieces[i].y, moves, movesIndex);
 	    break;
         default:
@@ -261,3 +284,4 @@ int states::moveGen(char color, move *moves){
     }
     return movesIndex;
 }
+
