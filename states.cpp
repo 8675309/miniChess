@@ -14,6 +14,17 @@ states::~states(){
 
 }
 
+states& states::operator= (const states &original){
+    onMove = original.onMove;
+    count = original.count;
+    for(int i = 0; i < 6; ++i){
+	for(int j = 0; j < 5; ++j){
+	    board[i][j] = original.board[i][j];
+	}
+    }
+    return *this;
+}
+
 int states::inBounds(int x, int y){
     if(x > -1 && x < 6 && y > -1 && y < 5)
 	return 1;
@@ -285,3 +296,56 @@ int states::moveGen(char color, move *moves){
     return movesIndex;
 }
 
+  //1 test move, 0 actual move
+void states::updateBoard(move myMove, char color,bool test){
+      int myFromX = myMove.fromSquare.x;
+      int myFromY = myMove.fromSquare.y;
+      int myToX = myMove.toSquare.x;
+      int myToY = myMove.toSquare.y;
+      char piece = board[myFromX][myFromY];
+      if(validMove(myMove, piece, color)){
+          board[myFromX][myFromY] = 'x';
+
+	if(test == 0 &&(board[myToX][myToY] == 'k' || board[myToX][myToY] == 'K')){
+            
+	board[myToX][myToY] = piece;
+        printBoard();
+	    gameOver(color);
+        }
+	board[myToX][myToY] = piece;
+	if(test == 0)
+	    ++count;
+	if(count >= 80){
+	    gameOver('D');
+	}
+    }
+    else
+	cout << "update board failed \n";
+}
+void updateUndo(move myMove, char savePiece){
+      int myFromX = myMove.fromSquare.x;
+      int myFromY = myMove.fromSquare.y;
+      int myToX = myMove.toSquare.x;
+      int myToY = myMove.toSquare.y;
+      char piece = board[myFromX][myFromY];
+     // char to = state.board[myToX][myToY];
+//cout << "update undo \n";
+//cout << "105 \n "<<"from x " << myFromX << "\n";
+//cout << "from y " << myFromY << "\n";
+//cout << " to x " << myToX << "\n";
+//cout << "to y " << myToY << "\n";
+//cout << "piece " << piece << "\n";
+      board[myFromX][myFromY] = savePiece;
+      board[myToX][myToY] = piece;
+//printBoard();
+}
+void undoMove(move myMove, char savePiece){
+ //   move reverse(myMove.toSquare.x,myMove.toSquare.y,myMove.fromSquare.x,myMove.fromSquare.x);
+    move reverse;
+    reverse.fromSquare.x = myMove.toSquare.x;
+    reverse.fromSquare.y = myMove.toSquare.y;
+    reverse.toSquare.x = myMove.fromSquare.x;
+    reverse.toSquare.y = myMove.fromSquare.y;
+    //1 means test move
+    updateUndo(reverse, savePiece);   
+}

@@ -8,7 +8,9 @@
   void readBoard();
   void printBoard();
   void compVsComp();
+  int negamax(states myState, int depth, int alpha, int beta, int turn, int color);
   int colorMatch(move myMove, char piece, char color);
+  int negamax(states myState, int depth, int alpha, int turn, int color);
   states state;
   
   int main (){
@@ -142,11 +144,6 @@ move reverse;
     reverse.fromSquare.y = myMove.toSquare.y;
     reverse.toSquare.x = myMove.fromSquare.x;
     reverse.toSquare.y = myMove.fromSquare.y;
-//cout << "undo move \n";
-//cout << "132 \n"<<" from x " << reverse.fromSquare.x << "\n";;
-//cout << "from y " << reverse.fromSquare.y << "\n";;
-//cout << "to x " << reverse.toSquare.x << "\n";;
-//cout << "to y " << reverse.toSquare.y << "\n";;
     //1 means test move
     updateUndo(reverse, savePiece);   
 }
@@ -156,11 +153,6 @@ move chooseMove(move *moves, char color, int count){
     char opponent;
     int i;
     move myMove = moves[0];
-//cout << "choose move 147 \n";
-//cout << "from x " << myMove.fromSquare.x << "\n";;
-//cout << "from y " << myMove.fromSquare.y << "\n";;
-//cout << "to x " << myMove.toSquare.x << "\n";;
-//cout << "to y " << myMove.toSquare.y << "\n";;
     if(color == 'W')
 	opponent = 'B';
     else
@@ -171,22 +163,51 @@ move chooseMove(move *moves, char color, int count){
     int score;
     for(i = 0; i < count; ++i){
 	//1 is for test move
-char savePiece = state.board[moves[i].toSquare.x][moves[i].toSquare.y];
+        char savePiece = state.board[moves[i].toSquare.x][moves[i].toSquare.y];
 	updateBoard(moves[i],color,1);
 	score = state.eval(opponent);
 	if(score < bestScore){
 	    bestScore = score;
 	    bestMove = i;
 	}
-//printBoard();
-//cout<< "undoing in choose move \n from x "  << moves[i].fromSquare.x << "\n";
-//cout<< "from y "  << moves[i].fromSquare.y << "\n";
-//cout << "to x " << moves[i].toSquare.x << "\n";;
-//cout << "to y " << moves[i].toSquare.y << "\n";;
 	undoMove(moves[i], savePiece);
     }
     myMove = moves[bestMove];
-cout << "final chose move 169 \n";
+cout << "final chose move 179\n";
+cout << "from x " << myMove.fromSquare.x << "\n";;
+cout << "from y " << myMove.fromSquare.y << "\n";;
+cout << "to x " << myMove.toSquare.x << "\n";;
+cout << "to y " << myMove.toSquare.y << "\n";;
+    return myMove;
+}
+
+move chooseMove2(move *moves, char color, int count){
+    cout << "Choosing move via negamax " << color << '\n';
+    char opponent;
+    int i;
+    move myMove = moves[0];
+    if(color == 'W')
+	opponent = 'B';
+    else
+	opponent = 'W';
+
+    int bestScore = 10000;
+    int bestMove = 0;
+    int score;
+    for(i = 0; i < count; ++i){
+	//1 is for test move
+        char savePiece = state.board[moves[i].toSquare.x][moves[i].toSquare.y];
+	updateBoard(moves[i],color,1);
+       //(state, depth,alpha,turn,color)
+	score = negamax(state, 4, bestScore, 1, opponent);
+	if(score < bestScore){
+	    bestScore = score;
+	    bestMove = i;
+	}
+	undoMove(moves[i], savePiece);
+    }
+    myMove = moves[bestMove];
+cout << "final chose move 214\n";
 cout << "from x " << myMove.fromSquare.x << "\n";;
 cout << "from y " << myMove.fromSquare.y << "\n";;
 cout << "to x " << myMove.toSquare.x << "\n";;
@@ -211,7 +232,7 @@ void compMove(char color){
    // srand((unsigned int) seconds) ; 
    // int random = rand() % i;
    // move myMove = moves[random];
-    move myMove = chooseMove(moves,color,count);
+    move myMove = chooseMove2(moves,color,count);
     //0 means real move
     updateBoard(myMove, color, 0);   
 }
@@ -330,3 +351,30 @@ void compVsComp(){
     printBoard();
   }
 }
+
+int negamax(states myState, int depth, int alpha, int turn, int color){
+    if(myState.eval(color) > 9000 || myState.eval(color) < 9000 || depth == 0 || myState.count >= 80)
+	return(turn * myState.eval(color));
+    else{
+	move moves[290];
+	int numMoves = myState.moveGen(color,moves);
+	for(int i = 0; i < numMoves ; ++i){
+            char savePiece = myState.board[moves[i].toSquare.x][moves[i].toSquare.y];
+           //1 means "test" so we don't think we won while searching, etc
+	    moves[i].child = myState.updateBoard(move,color,1);
+	    myState.undoMove(moves[i],savePiece);
+	    if(color == 'W')
+		color = 'B';
+	    else if(color == 'B')
+		color == 'W';
+	    if(alpha < -negamax(moves[i].child, depth-1, -alpha,-turn,color)){
+		alpha = -negamax(moves[i].child, depth-1, -alpha,-turn,color);
+		break;
+	    }
+        }
+	return alpha;
+      }
+}
+
+
+
