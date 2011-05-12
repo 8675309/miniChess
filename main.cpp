@@ -4,14 +4,15 @@
   #include <cstdlib>
   #include <time.h>
   void gameOver(char color);
-  void createStart(states);
+  void createStart(states &state);
   void readBoard();
-  void printBoard(states);
-  void compVsComp(states);
-  int negamax(states myState, int depth, int alpha, int beta, int turn, int color);
+  void printBoard(states &state);
+  void compVsComp(states &state);
+  //int negamax(states myState, int depth, int alpha, int beta, int turn, int color);
   int colorMatch(move myMove, char piece, char color);
-  int negamax(states myState, int depth, int alpha, int turn, int color);
+  int negamax(states &myState, int depth, int alpha, int turn, char color);
   states mainState;
+  
   
   int main (){
       createStart(mainState);
@@ -19,7 +20,7 @@
       return 0;
   }
   //checks to see if move passed to update board is valid
-  bool validMove(move myMove, char piece, char color,states state){
+  bool validMove(move myMove, char piece, char color,states &state){
       int movesIndex = 0;
   //    cout << "creating moves array\n";
       move moves[30];
@@ -32,28 +33,28 @@
           switch(piece){
           case 'k':
           case 'K':
-              state.kingMoves(myFromX, myFromY, moves, movesIndex, color );
+             (state).kingMoves(myFromX, myFromY, moves, movesIndex, color );
               break;
           case 'q':
           case 'Q':
-              state.queenMoves(myFromX, myFromY, moves, movesIndex, color);
+              (state).queenMoves(myFromX, myFromY, moves, movesIndex, color);
               break;
           case 'r':
           case 'R':
-             state.rookMoves(myFromX, myFromY, moves, movesIndex, color);
+             (state).rookMoves(myFromX, myFromY, moves, movesIndex, color);
               break;
           case 'b':
           case 'B':
-              state.bishopMoves(myFromX, myFromY, moves, movesIndex, color);
+              (state).bishopMoves(myFromX, myFromY, moves, movesIndex, color);
               break;
           case 'n':
           case 'N':
-              state.knightMoves(myFromX, myFromY, moves, movesIndex, color);
+              (state).knightMoves(myFromX, myFromY, moves, movesIndex, color);
               break;
           case 'P':
-              state.wPawnMoves(myFromX, myFromY, moves, movesIndex);
+              (state).wPawnMoves(myFromX, myFromY, moves, movesIndex);
           case 'p':
-              state.bPawnMoves(myFromX, myFromY, moves, movesIndex);
+              (state).bPawnMoves(myFromX, myFromY, moves, movesIndex);
               break;
           default:
               cout<< "non-valid piece in pieces[i], states.cpp";
@@ -83,24 +84,25 @@
       exit(0);
   }
   //1 test move, 0 actual move
-  void updateBoard(move myMove, char color,bool test, states state){
+  void updateBoard(move myMove, char color,bool test, states &state){
       int myFromX = myMove.fromSquare.x;
       int myFromY = myMove.fromSquare.y;
       int myToX = myMove.toSquare.x;
       int myToY = myMove.toSquare.y;
-      char piece = state.board[myFromX][myFromY];
+      char piece = 
+      (state).board[myFromX][myFromY];
       if(validMove(myMove, piece, color,state)){
-          state.board[myFromX][myFromY] = 'x';
+          (state).board[myFromX][myFromY] = 'x';
 
-	if(test == 0 &&(state.board[myToX][myToY] == 'k' || state.board[myToX][myToY] == 'K')){
+	if(test == 0 &&((state).board[myToX][myToY] == 'k' || (state).board[myToX][myToY] == 'K')){
             
-	state.board[myToX][myToY] = piece;
+	(state).board[myToX][myToY] = piece;
         printBoard(state);
 	    gameOver(color);
         }
-	state.board[myToX][myToY] = piece;
+	(state).board[myToX][myToY] = piece;
 	if(test == 0)
-	    ++state.count;
+	    ++((state).count);
 	if(state.count >= 80){
 	    gameOver('D');
 	}
@@ -108,12 +110,12 @@
     else
 	cout << "update board failed \n";
 }
-void updateUndo(move myMove, char savePiece, states state){
+void updateUndo(move myMove, char savePiece, states &state){
       int myFromX = myMove.fromSquare.x;
       int myFromY = myMove.fromSquare.y;
       int myToX = myMove.toSquare.x;
       int myToY = myMove.toSquare.y;
-      char piece = state.board[myFromX][myFromY];
+      char piece = (state).board[myFromX][myFromY];
      // char to = state.board[myToX][myToY];
 //cout << "update undo \n";
 //cout << "105 \n "<<"from x " << myFromX << "\n";
@@ -121,8 +123,8 @@ void updateUndo(move myMove, char savePiece, states state){
 //cout << " to x " << myToX << "\n";
 //cout << "to y " << myToY << "\n";
 //cout << "piece " << piece << "\n";
-      state.board[myFromX][myFromY] = savePiece;
-      state.board[myToX][myToY] = piece;
+      (state).board[myFromX][myFromY] = savePiece;
+      (state).board[myToX][myToY] = piece;
 //printBoard();
 }
 
@@ -137,9 +139,9 @@ int colorMatch(move myMove, char piece, char color){
 }
 
 
-void undoMove(move myMove, char savePiece,states state){
+void undoMove(move myMove, char savePiece,states &state){
  //   move reverse(myMove.toSquare.x,myMove.toSquare.y,myMove.fromSquare.x,myMove.fromSquare.x);
-move reverse;
+    move reverse;
     reverse.fromSquare.x = myMove.toSquare.x;
     reverse.fromSquare.y = myMove.toSquare.y;
     reverse.toSquare.x = myMove.fromSquare.x;
@@ -148,7 +150,7 @@ move reverse;
     updateUndo(reverse, savePiece,state);   
 }
 
-move chooseMove(move *moves, char color, int count, states state){
+move chooseMove(move *moves, char color, int count, states &state){
     cout << "Choosing move " << color << '\n';
     char opponent;
     int i;
@@ -163,9 +165,9 @@ move chooseMove(move *moves, char color, int count, states state){
     int score;
     for(i = 0; i < count; ++i){
 	//1 is for test move
-        char savePiece = state.board[moves[i].toSquare.x][moves[i].toSquare.y];
+        char savePiece = (state).board[moves[i].toSquare.x][moves[i].toSquare.y];
 	updateBoard(moves[i],color,1,state);
-	score = state.eval(opponent);
+	score = (state).eval(opponent);
 	if(score < bestScore){
 	    bestScore = score;
 	    bestMove = i;
@@ -181,10 +183,12 @@ cout << "to y " << myMove.toSquare.y << "\n";;
     return myMove;
 }
 
-move chooseMove2(move *moves, char color, int count, states state){
+move chooseMove2(move *moves, char color, int count, states &state){
     cout << "Choosing move via negamax " << color << '\n';
     char opponent;
     int i;
+    int turn = 1;
+    int depth = 4;
     move myMove = moves[0];
     if(color == 'W')
 	opponent = 'B';
@@ -196,10 +200,10 @@ move chooseMove2(move *moves, char color, int count, states state){
     int score;
     for(i = 0; i < count; ++i){
 	//1 is for test move
-        char savePiece = state.board[moves[i].toSquare.x][moves[i].toSquare.y];
+        char savePiece = (state).board[moves[i].toSquare.x][moves[i].toSquare.y];
 	updateBoard(moves[i],color,1,state);
        //(state, depth,alpha,turn,color)
-	score = negamax(state, 4, bestScore, 1, opponent);
+	score = negamax(state, depth, bestScore, turn, opponent);
 	if(score < bestScore){
 	    bestScore = score;
 	    bestMove = i;
@@ -216,9 +220,9 @@ cout << "to y " << myMove.toSquare.y << "\n";;
 }
 
 //generates random computer move
-void compMove(char color, states state){
+void compMove(char color, states &state){
     move moves[290];
-    int count = state.moveGen(color, moves);
+    int count = (state).moveGen(color, moves);
     if(count==0)
     {
       cout << "in if 149:no possible moves \n";
@@ -232,7 +236,7 @@ void compMove(char color, states state){
    // srand((unsigned int) seconds) ; 
    // int random = rand() % i;
    // move myMove = moves[random];
-    move myMove = chooseMove2(moves,color,count,state);
+    move myMove = chooseMove(moves,color,count,state);
     //0 means real move
     updateBoard(myMove, color, 0, state);   
 }
@@ -294,11 +298,11 @@ void humanMove(char color){
     updateBoard(myMove, color, 0, mainState);   
 }
 
-void printBoard( states state){
+void printBoard( states &state){
     int i,j;
     for(i=0; i<=5; ++i){
 	for(j=0; j<=4; ++j){
-	    cout << state.board[i][j];
+	    cout << (state).board[i][j];
 	}
 	cout << "\n" ;
     }
@@ -320,28 +324,28 @@ void readBoard(){
     }
 }
 
-void createStart(states state){
+void createStart(states &state){
     int i;
-    state.board[0][0] = 'k';     
-    state.board[0][1] = 'q';     
-    state.board[0][2] = 'b';     
-    state.board[0][3] = 'n';     
-    state.board[0][4] = 'r';     
-    state.board[5][0] = 'R';     
-    state.board[5][1] = 'N';     
-    state.board[5][2] = 'B';     
-    state.board[5][3] = 'Q';     
-    state.board[5][4] = 'K';
+    (state).board[0][0] = 'k';     
+    (state).board[0][1] = 'q';     
+    (state).board[0][2] = 'b';     
+    (state).board[0][3] = 'n';     
+    (state).board[0][4] = 'r';     
+    (state).board[5][0] = 'R';     
+    (state).board[5][1] = 'N';     
+    (state).board[5][2] = 'B';     
+    (state).board[5][3] = 'Q';     
+    (state).board[5][4] = 'K';
     for (i=0; i<=4; ++i){
-	    state.board[1][i] = 'p';
-	    state.board[4][i] = 'P';
-	    state.board[2][i] = 'x';
-	    state.board[3][i] = 'x';
+	    (state).board[1][i] = 'p';
+	    (state).board[4][i] = 'P';
+	    (state).board[2][i] = 'x';
+	    (state).board[3][i] = 'x';
     }     
 
 }
 
-void compVsComp(states state){
+void compVsComp(states &state){
   while(1){
     compMove('W',state);
 //    state.eval('W');
@@ -352,14 +356,14 @@ void compVsComp(states state){
   }
 }
 
-int negamax(states myState, int depth, int alpha, int turn, int color){
-    if(myState.eval(color) > 9000 || myState.eval(color) < 9000 || depth == 0 || myState.count >= 80)
-	return(turn * myState.eval(color));
+int negamax(states &myState, int depth, int alpha, int turn, char color){
+    if((myState).eval(color) > 9000 || (myState).eval(color) < 9000 || depth == 0 || (myState).count >= 80)
+	return(turn * (myState).eval(color));
     else{
 	move moves[290];
-	int numMoves = myState.moveGen(color,moves);
+	int numMoves = (myState).moveGen(color,moves);
 	for(int i = 0; i < numMoves ; ++i){
-            char savePiece = myState.board[moves[i].toSquare.x][moves[i].toSquare.y];
+            char savePiece = (myState).board[moves[i].toSquare.x][moves[i].toSquare.y];
            //1 means "test" so we don't think we won while searching, etc
 	     updateBoard(moves[i],color,1,myState);
 	    moves[i].child = myState; 
