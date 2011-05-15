@@ -91,6 +91,7 @@ int states::findPieces(char color, square *pieces){
 			}
 		}
     }
+   // cout<< color <<" k: " << k << '\n';
     return k;
 }
 
