@@ -21,6 +21,13 @@ move::move(int q,int r,int z,int w){
    states child;
 }
 
+move& move::operator= (const move &original){
+    fromSquare = original.fromSquare;
+    toSquare = original.toSquare;
+    child = original.child;
+    return *this;
+}
+
 move::~move(){
 
 }

@@ -13,6 +13,12 @@ square::square(int q,int r){
      y = r;
 }
 
+square& square::operator= (const square &original){
+    x = original.x;
+    y = original.y;
+    return *this;
+}
+
 square::~square(){
 
 }

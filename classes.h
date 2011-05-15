@@ -13,6 +13,7 @@ class square{
         ~square();
         int x; // 0 to 5
         int y; // 0 to 4
+        square& operator= (const square &original);
 };
 
 class states{
@@ -50,5 +51,5 @@ class move{
 	    square toSquare;
 	    square fromSquare;
 	    states child;
-//	    move& operator= (const move &original);
+	    move& operator= (const move &original);
 };
