@@ -73,7 +73,7 @@
       }  
        cout << "invalid move \n";
           cout <<" from "  << myMove.fromSquare.x << " " << myMove.fromSquare.y ;
-          cout <<" to "  << myMove.toSquare.x << " " << myMove.toSquare.y ;
+          cout <<" to "  << myMove.toSquare.x << " " << myMove.toSquare.y << '\n';
             
        gameOver('E');
        return false;
@@ -186,7 +186,7 @@ move chooseMove2(move *moves, char color, int count, states &state){
     cout << "Choosing move via negamax " << color << '\n';
     char opponent;
     int i;
-    int turn = 1;
+    int turn = -1;
     int depth = 4;
     move myMove = moves[0];
     if(color == 'W')
