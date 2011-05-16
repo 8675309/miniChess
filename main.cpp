@@ -10,7 +10,7 @@
   void compVsComp(states &state);
   //int negamax(states myState, int depth, int alpha, int beta, int turn, int color);
   int colorMatch(move &myMove, char piece, char color);
-  int negamax(states &myState, int depth, int alpha, int turn, char color);
+  int negamax(states &myState, int depth, char color);
   states mainState;
   
   
@@ -186,7 +186,6 @@ move chooseMove2(move *moves, char color, int count, states &state){
     cout << "Choosing move via negamax " << color << '\n';
     char opponent;
     int i;
-    int turn = -1;
     int depth = 4;
     move myMove = moves[0];
     if(color == 'W')
@@ -194,7 +193,7 @@ move chooseMove2(move *moves, char color, int count, states &state){
     else
 	opponent = 'W';
 
-    int bestScore = -10000;
+    int bestScore = -5000;
     int bestMove = 0;
     int score;
     for(i = 0; i < count; ++i){
@@ -202,7 +201,7 @@ move chooseMove2(move *moves, char color, int count, states &state){
         char savePiece = (state).board[moves[i].toSquare.x][moves[i].toSquare.y];
 	updateBoard(moves[i],color,1,state);
        //(state, depth,alpha,turn,color)
-	score = -negamax(state, depth, bestScore, turn, opponent);
+	score = -negamax(state, depth-1, opponent);
 	if(score > bestScore){
 	    bestScore = score;
 	    bestMove = i;
@@ -355,28 +354,32 @@ void compVsComp(states &state){
   }
 }
 
-int negamax(states &myState, int depth, int alpha, int turn, char color){
-    if((myState).eval(color) > 9000 || (myState).eval(color) < -9000 || depth == 0 || (myState).count >= 80)
-	return(turn * myState.eval(color));
+int negamax(states &myState, int depth, char color){
+    char opposite;
+    int max = -5000;
+    if((myState).eval(color) > 5000 || (myState).eval(color) < -5000 || depth == 0 || (myState).count >= 80)
+	return(myState.eval(color));
     else{
 	move moves[290];
 	int numMoves = myState.moveGen(color,moves);
+	    if(color == 'W')
+		opposite = 'B';
+	    else if(color == 'B')
+		opposite = 'W';
+//the for loop is the breadth part, negamax is the depth
 	for(int i = 0; i < numMoves ; ++i){
             char savePiece = myState.board[moves[i].toSquare.x][moves[i].toSquare.y];
            //1 means "test" so we don't think we won while searching, etc
 	     updateBoard(moves[i],color,1,myState);
 	    moves[i].child = myState; 
 	    undoMove(moves[i],savePiece,myState);
-	    if(color == 'W')
-		color = 'B';
-	    else if(color == 'B')
-		color = 'W';
-	    if(alpha < -negamax(moves[i].child, depth-1, -alpha,-turn,color)){
-		alpha = -negamax(moves[i].child, depth-1, -alpha,-turn,color);
-		break;
+//don't alternate! Instead create variable opponent and keep it consistant
+	    int temp = -negamax(moves[i].child, depth-1,opposite);
+	    if(max < temp){
+		max = temp;
 	    }
         }
-	return alpha;
+	return max;
       }
 }
 
