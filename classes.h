@@ -53,7 +53,7 @@ class move{
 	states child;
 	int value;
 	move& operator= (const move &original);
-	bool operator< (const move& a, const move& b);
+	bool operator< (const move& other) const;
 };
 
 

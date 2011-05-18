@@ -31,8 +31,8 @@ move& move::operator= (const move &original){
     return *this;
 }
 
-bool move::operator< (const move& a, const move& b){
-    return (a.value) < (b.value) ;
+bool move::operator< (const move& other) const{
+    return (value < other.value) ;
 }
 
 move::~move(){

@@ -111,6 +111,7 @@
     else
 	cout << "update board failed \n";
 }
+
 void updateUndo(move &myMove, char savePiece, states &state){
       int myFromX = myMove.fromSquare.x;
       int myFromY = myMove.fromSquare.y;
@@ -185,7 +186,8 @@ cout << "to y " << myMove.toSquare.y << "\n";;
 }
  
 int pieceValue(char piece){
-	switch(board[pieces[i].x][pieces[i].y]){
+	int value;
+	switch(piece){
 		case 'k':
 		case 'K':
 			value = 10000;
@@ -225,7 +227,7 @@ void shuffle(move *moves, int count){
 }
 
 void sortMoves(move *moves, int count, states &state, int value){
-    for(i = 0; i < count; ++i){
+    for(int i = 0; i < count; ++i){
         char savePiece = (state).board[moves[i].toSquare.x][moves[i].toSquare.y];
 	if(savePiece == 'x')
             moves[i].value = value;
