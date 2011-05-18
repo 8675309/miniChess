@@ -10,7 +10,7 @@
   void compVsComp(states &state);
   //int negamax(states myState, int depth, int alpha, int beta, int turn, int color);
   int colorMatch(move &myMove, char piece, char color);
-  int negamax(states &myState, int depth, char color,int time);
+  int negamax(states &myState, int depth, int alpha, int beta, char color,int time);
   states mainState;
   
   
@@ -189,6 +189,8 @@ move chooseMove2(move *moves, char color, int count, states &state){
     char opponent;
     int i;
     int depth = 1;
+    int alpha = -10000;
+    int beta = 10000;
     move myMove = moves[0];
     if(color == 'W')
 	opponent = 'B';
@@ -200,10 +202,10 @@ move chooseMove2(move *moves, char color, int count, states &state){
     int score;
   while(clock() < time){
     for(i = 0; i < count; ++i){
-	//1 is for test move
+	//2 is for test move
         char savePiece = (state).board[moves[i].toSquare.x][moves[i].toSquare.y];
 	updateBoard(moves[i],color,1,state);
-	score = -negamax(state, depth, opponent,time);
+	score = -negamax(state, depth, alpha, beta, opponent,time);
 	if(score > bestScore){
 	    bestScore = score;
 	    bestMove = i;
@@ -359,9 +361,9 @@ void compVsComp(states &state){
   }
 }
 
-int negamax(states &myState, int depth, char color, int time){
+int negamax(states &myState, int depth, int alpha, int beta, char color, int time){
     char opposite;
-    int max = -5000;
+   // int max = -5000;
     if((myState).eval(color) > 5000 || (myState).eval(color) < -5000 || depth == 0 || (myState).count >= 80)
 	return(myState.eval(color));
     else{
@@ -380,18 +382,23 @@ int negamax(states &myState, int depth, char color, int time){
 	     updateBoard(moves[i],color,1,myState);
 	    moves[i].child = myState; 
 	    undoMove(moves[i],savePiece,myState);
-//don't alternate! Instead create variable opponent and keep it consistant
-	    int temp = -negamax(moves[i].child, depth-1,opposite,time);
-	    if(max < temp){
-		max = temp;
+	   // int temp = -negamax(moves[i].child, depth-1,opposite,time);
+	   // if(max < temp)
+	   //	max = temp;
+	     int temp = -negamax(moves[i].child, depth-1, -alpha, -beta, opposite, time);
+	    if(alpha < temp){
+	   	alpha = temp;
 	    }
+	    if(alpha >= beta)
+		break;
           }
 //WITH AN ELSE HERE BREAKING AND SETTING MAX TO AN INVALID NUMBER
          else{
 	    return 50000;
 	 }
         }
-	return max;
+	return alpha;
+//	return max;
       }
 }
 
