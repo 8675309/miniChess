@@ -183,6 +183,38 @@ cout << "to x " << myMove.toSquare.x << "\n";;
 cout << "to y " << myMove.toSquare.y << "\n";;
     return myMove;
 }
+ 
+int pieceValue(char piece){
+	switch(board[pieces[i].x][pieces[i].y]){
+		case 'k':
+		case 'K':
+			value = 10000;
+			break;
+		case 'q':
+		case 'Q':
+			value = 900;
+			break;
+		case 'r':
+		case 'R':
+			value = 500;
+			break;
+		case 'b':
+		case 'B':
+			value = 300;
+			break;
+		case 'n':
+		case 'N':
+			value = 200;
+			break;
+		case 'p':
+		case 'P':
+			value = 100;
+			break;
+	        default:
+		    cout << "pieceValue was given an invalid piece \n";
+         }
+	return value;
+}
 
 //code stolen from www.fredosaurus.com/notes-cpp/misc/random-shuffle.htm
 void shuffle(move *moves, int count){
@@ -192,15 +224,13 @@ void shuffle(move *moves, int count){
         }
 }
 
-void sortMoves(move *moves, int count, char color, states &state){
-    int test = 1;
-    //calculate value of each move
+void sortMoves(move *moves, int count, states &state, int value){
     for(i = 0; i < count; ++i){
         char savePiece = (state).board[moves[i].toSquare.x][moves[i].toSquare.y];
-	updateBoard(moves[i],color,test,state);
- 	moves[i].value = state.eval(color);
-	undoMove(moves[i], savePiece,state);
-	
+	if(savePiece == 'x')
+            moves[i].value = value;
+	else 
+	    moves[i].value = value - pieceValue(savePiece);
     }
     //sort moves from zero to count-1
     sort(moves, moves+count);
@@ -213,8 +243,10 @@ move chooseMove2(move *moves, char color, int count, states &state){
     int test = 1;
     int alpha = -10000;
     int beta = 10000;
+    //this is opponents value for sorting moves
+    int value = -(state.eval(color));
     shuffle(moves,count);
-    sortMoves(moves, count, color, state);
+    sortMoves(moves, count, state, value);
     int seconds = 5;
     int time = clock() + seconds*CLOCKS_PER_SEC;
     cout << "Choosing move via negamax " << color << '\n';
