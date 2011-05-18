@@ -9,6 +9,7 @@ move::move(){
     toSquare.x = -1;
     toSquare.y = -1;
     states child;
+    int value = -1;
 }
 
 move::move(int q,int r,int z,int w){
@@ -19,13 +20,19 @@ move::move(int q,int r,int z,int w){
    // toSquare.x = z;
    // toSquare.y = w;
    states child;
+   int value = -1;
 }
 
 move& move::operator= (const move &original){
     fromSquare = original.fromSquare;
     toSquare = original.toSquare;
     child = original.child;
+    value = original.value;
     return *this;
+}
+
+bool move::operator< (const move& a, const move& b){
+    return (a.value) < (b.value) ;
 }
 
 move::~move(){

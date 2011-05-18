@@ -45,11 +45,19 @@ class states{
 
 class move{
     public:
-	    move();
-            move(int x,int y,int z, int w);
-            ~move();
-	    square toSquare;
-	    square fromSquare;
-	    states child;
-	    move& operator= (const move &original);
+	move();
+        move(int x,int y,int z, int w);
+        ~move();
+	square toSquare;
+	square fromSquare;
+	states child;
+	int value;
+	move& operator= (const move &original);
+	bool operator< (const move& a, const move& b);
 };
+
+
+
+
+
+

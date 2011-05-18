@@ -3,6 +3,7 @@
   #include "classes.h"
   #include <cstdlib>
   #include <time.h>
+  #include <algorithm>
   void gameOver(char color);
   void createStart(states &state);
   void readBoard();
@@ -90,8 +91,7 @@
       int myFromY = myMove.fromSquare.y;
       int myToX = myMove.toSquare.x;
       int myToY = myMove.toSquare.y;
-      char piece = 
-      (state).board[myFromX][myFromY];
+      char piece = (state).board[myFromX][myFromY];
       if(validMove(myMove, piece, color,state)){
         (state).board[myFromX][myFromY] = 'x';
 	if(test == 0 &&((state).board[myToX][myToY] == 'k' || (state).board[myToX][myToY] == 'K')){   
@@ -99,6 +99,8 @@
             printBoard(state);
 	    gameOver(color);
         }
+//*******************************WRITE THIS CODE!!!!!!!!!!!!!!!*************************************
+        //if test == zero and pawn reaches other side, promote to queen
 	(state).board[myToX][myToY] = piece;
 	if(test == 0)
 	    ++((state).count);
@@ -182,15 +184,40 @@ cout << "to y " << myMove.toSquare.y << "\n";;
     return myMove;
 }
 
+//code stolen from www.fredosaurus.com/notes-cpp/misc/random-shuffle.htm
+void shuffle(move *moves, int count){
+     for (int i = 0; i < count; i++) {
+            int r = rand() % count;  // generate a random position
+            move temp = moves[i]; moves[i] = moves[r]; moves[r] = temp;
+        }
+}
+
+void sortMoves(move *moves, int count, char color, states &state){
+    int test = 1;
+    //calculate value of each move
+    for(i = 0; i < count; ++i){
+        char savePiece = (state).board[moves[i].toSquare.x][moves[i].toSquare.y];
+	updateBoard(moves[i],color,test,state);
+ 	moves[i].value = state.eval(color);
+	undoMove(moves[i], savePiece,state);
+	
+    }
+    //sort moves from zero to count-1
+    sort(moves, moves+count);
+}
+
 move chooseMove2(move *moves, char color, int count, states &state){
-    int seconds = 1;
-    int time = clock() + seconds*CLOCKS_PER_SEC;
-    cout << "Choosing move via negamax " << color << '\n';
     char opponent;
     int i;
     int depth = 1;
+    int test = 1;
     int alpha = -10000;
     int beta = 10000;
+    shuffle(moves,count);
+    sortMoves(moves, count, color, state);
+    int seconds = 5;
+    int time = clock() + seconds*CLOCKS_PER_SEC;
+    cout << "Choosing move via negamax " << color << '\n';
     move myMove = moves[0];
     if(color == 'W')
 	opponent = 'B';
@@ -202,9 +229,8 @@ move chooseMove2(move *moves, char color, int count, states &state){
     int score;
   while(clock() < time){
     for(i = 0; i < count; ++i){
-	//2 is for test move
         char savePiece = (state).board[moves[i].toSquare.x][moves[i].toSquare.y];
-	updateBoard(moves[i],color,1,state);
+	updateBoard(moves[i],color,test,state);
 	score = -negamax(state, depth, alpha, beta, opponent,time);
 	if(score > bestScore){
 	    bestScore = score;
@@ -375,8 +401,12 @@ int negamax(states &myState, int depth, int alpha, int beta, char color, int tim
 		opposite = 'W';
 //the for loop is the breadth part, negamax is the depth
 	for(int i = 0; i < numMoves ; ++i){
-//MAYBE A TIME CHECK HERE?
           if(clock() < time){
+	    //HERE: shuffle then sort first numMoves-1 indexes of moves
+
+
+
+
             char savePiece = myState.board[moves[i].toSquare.x][moves[i].toSquare.y];
            //1 means "test" so we don't think we won while searching, etc
 	     updateBoard(moves[i],color,1,myState);
@@ -392,7 +422,7 @@ int negamax(states &myState, int depth, int alpha, int beta, char color, int tim
 	    if(alpha >= beta)
 		break;
           }
-//WITH AN ELSE HERE BREAKING AND SETTING MAX TO AN INVALID NUMBER
+         //if we're out of time, set return value to rediculusly bad so we reject it
          else{
 	    return 50000;
 	 }
