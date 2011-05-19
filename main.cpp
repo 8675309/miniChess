@@ -424,8 +424,9 @@ void compVsComp(states &state){
 int negamax(states &myState, int depth, int alpha, int beta, char color, int time){
     char opposite;
    // int max = -5000;
-    if((myState).eval(color) > 5000 || (myState).eval(color) < -5000 || depth == 0 || (myState).count >= 80)
-	return(myState.eval(color));
+    int value = myState.eval(color);
+    if(value > 5000 || value < -5000 || depth == 0 || (myState).count >= 80)
+	return(value);
     else{
 	move moves[290];
 	int numMoves = myState.moveGen(color,moves);
@@ -437,10 +438,8 @@ int negamax(states &myState, int depth, int alpha, int beta, char color, int tim
 	for(int i = 0; i < numMoves ; ++i){
           if(clock() < time){
 	    //HERE: shuffle then sort first numMoves-1 indexes of moves
-
-
-
-
+    	    shuffle(moves,numMoves);
+    	    sortMoves(moves, numMoves, myState, -value);
             char savePiece = myState.board[moves[i].toSquare.x][moves[i].toSquare.y];
            //1 means "test" so we don't think we won while searching, etc
 	     updateBoard(moves[i],color,1,myState);
