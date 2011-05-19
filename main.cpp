@@ -443,17 +443,17 @@ int negamax(states &myState, int depth, int alpha, int beta, char color, int tim
             char savePiece = myState.board[moves[i].toSquare.x][moves[i].toSquare.y];
            //1 means "test" so we don't think we won while searching, etc
 	     updateBoard(moves[i],color,1,myState);
-	    moves[i].child = myState; 
-	    undoMove(moves[i],savePiece,myState);
+	   // moves[i].child = myState; 
 	   // int temp = -negamax(moves[i].child, depth-1,opposite,time);
 	   // if(max < temp)
 	   //	max = temp;
-	     int temp = -negamax(moves[i].child, depth-1, -alpha, -beta, opposite, time);
+	     int temp = -negamax(myState, depth-1, -alpha, -beta, opposite, time);
 	    if(alpha < temp){
 	   	alpha = temp;
 	    }
+	    undoMove(moves[i],savePiece,myState);
 	    if(alpha >= beta)
-		break;
+		return alpha;
           }
          //if we're out of time, set return value to rediculusly bad so we reject it
          else{
