@@ -35,6 +35,10 @@ bool move::operator< (const move& other) const{
     return (value < other.value) ;
 }
 
+bool move::operator> (const move& other) const{
+    return (value > other.value) ;
+}
+
 move::~move(){
 
 }

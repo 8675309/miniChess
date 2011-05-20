@@ -54,6 +54,7 @@ class move{
 	int value;
 	move& operator= (const move &original);
 	bool operator< (const move& other) const;
+	bool operator> (const move& other) const;
 };
 
 

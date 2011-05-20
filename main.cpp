@@ -118,16 +118,8 @@ void updateUndo(move &myMove, char savePiece, states &state){
       int myToX = myMove.toSquare.x;
       int myToY = myMove.toSquare.y;
       char piece = (state).board[myFromX][myFromY];
-     // char to = state.board[myToX][myToY];
-//cout << "update undo \n";
-//cout << "120 \n "<<"from x " << myFromX << "\n";
-//cout << "from y " << myFromY << "\n";
-//cout << " to x " << myToX << "\n";
-//cout << "to y " << myToY << "\n";
-//cout << "piece " << piece << "\n";
       (state).board[myFromX][myFromY] = savePiece;
       (state).board[myToX][myToY] = piece;
-//printBoard();
 }
 
 int colorMatch(move &myMove, char piece, char color){
@@ -142,13 +134,11 @@ int colorMatch(move &myMove, char piece, char color){
 
 
 void undoMove(move &myMove, char savePiece,states &state){
- //   move reverse(myMove.toSquare.x,myMove.toSquare.y,myMove.fromSquare.x,myMove.fromSquare.x);
     move reverse;
     reverse.fromSquare.x = myMove.toSquare.x;
     reverse.fromSquare.y = myMove.toSquare.y;
     reverse.toSquare.x = myMove.fromSquare.x;
     reverse.toSquare.y = myMove.fromSquare.y;
-    //1 means test move
     updateUndo(reverse, savePiece,state);   
 }
 
@@ -178,10 +168,12 @@ move chooseMove(move *moves, char color, int count, states &state){
     }
     myMove = moves[bestMove];
 cout << "final chose move 179\n";
-cout << "from x " << myMove.fromSquare.x << "\n";;
-cout << "from y " << myMove.fromSquare.y << "\n";;
-cout << "to x " << myMove.toSquare.x << "\n";;
-cout << "to y " << myMove.toSquare.y << "\n";;
+cout << "from x " << myMove.fromSquare.x << "\n";
+cout << "from y " << myMove.fromSquare.y << "\n";
+cout << "to x " << myMove.toSquare.x << "\n";
+cout << "to y " << myMove.toSquare.y << "\n";
+cout << opponent << " " ;
+cout << (state).board[myMove.toSquare.x][myMove.toSquare.y] << " captured \n";
     return myMove;
 }
  
@@ -225,14 +217,14 @@ void shuffle(move *moves, int count){
             move temp = moves[i]; moves[i] = moves[r]; moves[r] = temp;
         }
 }
-
+//sorts moves in ascending order for value of color passed in (value)
 void sortMoves(move *moves, int count, states &state, int value){
     for(int i = 0; i < count; ++i){
         char savePiece = (state).board[moves[i].toSquare.x][moves[i].toSquare.y];
 	if(savePiece == 'x')
             moves[i].value = value;
 	else 
-	    moves[i].value = value - pieceValue(savePiece);
+	    moves[i].value = value + pieceValue(savePiece);
     }
     //sort moves from zero to count-1
     sort(moves, moves+count);
@@ -246,7 +238,7 @@ move chooseMove2(move *moves, char color, int count, states &state){
     int alpha = -10000;
     int beta = 10000;
     //this is opponents value for sorting moves
-    int value = -(state.eval(color));
+    int value = state.eval(color);
     shuffle(moves,count);
     sortMoves(moves, count, state, value);
     int seconds = 5;
@@ -265,7 +257,7 @@ move chooseMove2(move *moves, char color, int count, states &state){
     for(i = 0; i < count; ++i){
         char savePiece = (state).board[moves[i].toSquare.x][moves[i].toSquare.y];
 	updateBoard(moves[i],color,test,state);
-	score = -negamax(state, depth, alpha, beta, opponent,time);
+	score = -negamax(state, depth, -alpha, -beta, opponent,time);
 	if(score > bestScore){
 	    bestScore = score;
 	    bestMove = i;
@@ -281,6 +273,8 @@ cout << "from x " << myMove.fromSquare.x << "\n";;
 cout << "from y " << myMove.fromSquare.y << "\n";;
 cout << "to x " << myMove.toSquare.x << "\n";;
 cout << "to y " << myMove.toSquare.y << "\n";;
+cout << opponent << " " ;
+cout << (state).board[myMove.toSquare.x][myMove.toSquare.y] << " captured \n";
     return myMove;
 }
 
@@ -430,23 +424,19 @@ int negamax(states &myState, int depth, int alpha, int beta, char color, int tim
     else{
 	move moves[290];
 	int numMoves = myState.moveGen(color,moves);
-	    if(color == 'W')
-		opposite = 'B';
-	    else if(color == 'B')
-		opposite = 'W';
-//the for loop is the breadth part, negamax is the depth
+	if(color == 'W')
+	    opposite = 'B';
+	else if(color == 'B')
+	    opposite = 'W';
+	//HERE: shuffle then sort first numMoves-1 indexes of moves
+    	shuffle(moves,numMoves);
+    	sortMoves(moves, numMoves, myState, value);
+	//the for loop is the breadth part, negamax is the depth
 	for(int i = 0; i < numMoves ; ++i){
           if(clock() < time){
-	    //HERE: shuffle then sort first numMoves-1 indexes of moves
-    	    shuffle(moves,numMoves);
-    	    sortMoves(moves, numMoves, myState, -value);
             char savePiece = myState.board[moves[i].toSquare.x][moves[i].toSquare.y];
            //1 means "test" so we don't think we won while searching, etc
 	     updateBoard(moves[i],color,1,myState);
-	   // moves[i].child = myState; 
-	   // int temp = -negamax(moves[i].child, depth-1,opposite,time);
-	   // if(max < temp)
-	   //	max = temp;
 	     int temp = -negamax(myState, depth-1, -alpha, -beta, opposite, time);
 	    if(alpha < temp){
 	   	alpha = temp;
