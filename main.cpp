@@ -99,8 +99,13 @@
             printBoard(state);
 	    gameOver(color);
         }
-//*******************************WRITE THIS CODE!!!!!!!!!!!!!!!*************************************
         //if test == zero and pawn reaches other side, promote to queen
+	if(color == 'W' && test == 0 && piece == 'P' && myToX == 0 ){
+	    piece = 'Q';
+	}
+	if(color == 'B' && test == 0 && piece == 'p' && myToX == 5 ){
+	    piece = 'q';
+	}
 	(state).board[myToX][myToY] = piece;
 	if(test == 0)
 	    ++((state).count);
@@ -257,7 +262,7 @@ move chooseMove2(move *moves, char color, int count, states &state){
     for(i = 0; i < count; ++i){
         char savePiece = (state).board[moves[i].toSquare.x][moves[i].toSquare.y];
 	updateBoard(moves[i],color,test,state);
-	score = -negamax(state, depth, -alpha, -beta, opponent,time);
+	score = -negamax(state, depth, alpha, beta, opponent,time);
 	if(score > bestScore){
 	    bestScore = score;
 	    bestMove = i;
@@ -437,7 +442,7 @@ int negamax(states &myState, int depth, int alpha, int beta, char color, int tim
             char savePiece = myState.board[moves[i].toSquare.x][moves[i].toSquare.y];
            //1 means "test" so we don't think we won while searching, etc
 	     updateBoard(moves[i],color,1,myState);
-	     int temp = -negamax(myState, depth-1, -alpha, -beta, opposite, time);
+	     int temp = -negamax(myState, depth-1, -beta, -alpha, opposite, time);
 	    if(alpha < temp){
 	   	alpha = temp;
 	    }
