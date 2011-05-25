@@ -92,6 +92,7 @@
       int myToX = myMove.toSquare.x;
       int myToY = myMove.toSquare.y;
       char piece = (state).board[myFromX][myFromY];
+//MAKE THIS CONDITIONAL FOR TESTING ONLY!***************************(AND USER INPUT :P )
       if(validMove(myMove, piece, color,state)){
         (state).board[myFromX][myFromY] = 'x';
 	if(test == 0 &&((state).board[myToX][myToY] == 'k' || (state).board[myToX][myToY] == 'K')){   
@@ -240,9 +241,8 @@ move chooseMove2(move *moves, char color, int count, states &state){
     int i;
     int depth = 1;
     int test = 1;
-    int alpha = -10000;
-    int beta = 10000;
-    //this is opponents value for sorting moves
+    int alpha = -13000;
+    int beta = 13000;
     int value = state.eval(color);
     shuffle(moves,count);
     sortMoves(moves, count, state, value);
@@ -295,11 +295,6 @@ void compMove(char color, states &state){
 	else
 	       gameOver('W');
     }
-   // time_t seconds;
-   // time(&seconds);
-   // srand((unsigned int) seconds) ; 
-   // int random = rand() % i;
-   // move myMove = moves[random];
     move myMove = chooseMove2(moves,color,count,state);
     //0 means real move
     updateBoard(myMove, color, 0, state);   
@@ -406,7 +401,6 @@ void createStart(states &state){
 	    (state).board[2][i] = 'x';
 	    (state).board[3][i] = 'x';
     }     
-
 }
 
 void compVsComp(states &state){
@@ -456,7 +450,6 @@ int negamax(states &myState, int depth, int alpha, int beta, char color, int tim
 	 }
         }
 	return alpha;
-//	return max;
       }
 }
 
