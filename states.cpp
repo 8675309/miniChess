@@ -34,31 +34,25 @@ int states::inBounds(int x, int y){
 
 //0 if coordinate square is empty 
 int states::checkEmpty(int x, int y, char color){
-//cout << "\n check empty:\n" << color << '\n' <<" board " <<x <<" "<< y << " " <<  board[x][y] << '\n';
 
     if(board[x][y] == 120){
-//        cout << "returning 0 for empty";
 	return 0; //empty
     }
 
     else if(color == 'W'){
 	if(board[x][y] > 97 && board[x][y] < 115){
-  //          cout << "returning 1 for opp";
 	    return 1;  //opponent
         }
 	else{ 
-    //        cout << "returning 2 for self";
 	    return 2; //self
          }
 
    }
     else if(color == 'B'){
 	if(board[x][y] < 83 && board[x][y] > 65){
-  //          cout << "returning 1 for opp";
 	    return 1;
         }
 	else{ 
-    //        cout << "returning 2 for self";
 	    return 2;
         }
     }
@@ -139,9 +133,31 @@ int states::addPieces(int count,square *pieces){
 			case 'N':
 				score += 200;
 				break;
-			case 'p':
 			case 'P':
-				score += 100;
+				int x = pieces[i].x;
+				if(x == 4)
+				    score += 200;
+				else if(x == 3)
+				    score += 400;
+				else if(x == 2)
+				    score += 500;
+				else if(x == 1)
+				    score += 600;
+				else if(x == 0)
+				    score += 900;
+				break;
+			case 'p':
+				x = pieces[i].x;
+				if(x == 1)
+				    score += 200;
+				else if(x == 2)
+				    score += 400;
+				else if(x == 3)
+				    score += 500;
+				else if(x == 4)
+				    score += 600;
+				else if(x == 5)
+				    score += 900;
 				break;
 			default:
 				cout<< "120 non-valid piece in pieces[i], states.cpp \n";
