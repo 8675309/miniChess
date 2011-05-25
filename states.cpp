@@ -206,14 +206,14 @@ void states::kingMoves(int x, int y, move *moves, int &movesIndex, char color){
 void states::bishopMoves(int x, int y, move *moves, int &movesIndex, char color){
     checkDiag(x, y, moves, movesIndex, multiple, color); 
 
-    if(inBounds(x-1, y) && checkEmpty(x-1, y,color) == 0){
+    if(inBounds(x-1, y) && checkEmpty(x-1, y,color) == 0)
        scan(x, y, moves, movesIndex, -1, 0, single, color); //north
-    if(inBounds(x+1, y) && checkEmpty(x+1, y, color) == 0){
+    if(inBounds(x+1, y) && checkEmpty(x+1, y, color) == 0)
         scan(x, y, moves, movesIndex, 1, 0, single, color); //south
 
-    if(inBounds(x, y+1) && checkEmpty(x, y+1, color) == 0){
+    if(inBounds(x, y+1) && checkEmpty(x, y+1, color) == 0)
         scan(x, y, moves, movesIndex, 0, 1, single, color); //east
-    if(inBounds(x, y-1) && checkEmpty(x, y-1, color) == 0){
+    if(inBounds(x, y-1) && checkEmpty(x, y-1, color) == 0)
         scan(x, y, moves, movesIndex, 0, -1, single, color); //west
 }
 
