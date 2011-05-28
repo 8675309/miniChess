@@ -12,16 +12,29 @@
   //int negamax(states myState, int depth, int alpha, int beta, int turn, int color);
   int colorMatch(move &myMove, char piece, char color);
   int negamax(states &myState, int depth, int alpha, int beta, char color,int time);
+  int transToChessNum(int num);
+  void transToChess(char *moveCode, move &myMove);
+  char transToChar(int num);
+  void networkPlay(char myColor,states &mainState);
   states mainState;
-  
+  //set this to false during a real game
+  bool debug = false;  
+  bool gameEnd = false;
+  bool liveGame = true;
   
   int main (){
+      char myColor = 'W';
       createStart(mainState);
-      compVsComp(mainState);
+      networkPlay(myColor, mainState);
+      
+  //    compVsComp(mainState);
       return 0;
   }
   //checks to see if move passed to update board is valid
   bool validMove(move &myMove, char piece, char color,states &state){
+      //if we're playing a real game, don't validate
+      if (debug == false)
+	return true;
       int movesIndex = 0;
   //    cout << "creating moves array\n";
       move moves[30];
@@ -81,7 +94,13 @@
   } 
 
   void gameOver(char color){
-      cout << "game over " << color << " wins \n";
+      if(color == 'D')
+	cout << " Draw";
+      else if(color == 'E')
+	cout << " Game over. Ended due to Error";
+      else
+        cout <<  color << " wins \n";
+      gameEnd = true;
       printBoard(mainState);
       exit(0);
   }
@@ -92,7 +111,6 @@
       int myToX = myMove.toSquare.x;
       int myToY = myMove.toSquare.y;
       char piece = (state).board[myFromX][myFromY];
-//MAKE THIS CONDITIONAL FOR TESTING ONLY!***************************(AND USER INPUT :P )
       if(validMove(myMove, piece, color,state)){
         (state).board[myFromX][myFromY] = 'x';
 	if(test == 0 &&((state).board[myToX][myToY] == 'k' || (state).board[myToX][myToY] == 'K')){   
@@ -208,7 +226,8 @@ int pieceValue(char piece){
 			break;
 		case 'p':
 		case 'P':
-			value = 100;
+			//this is now average-ish but it's just for the sort, so it's ok
+			value = 300;
 			break;
 	        default:
 		    cout << "pieceValue was given an invalid piece \n";
@@ -298,6 +317,11 @@ void compMove(char color, states &state){
     move myMove = chooseMove2(moves,color,count,state);
     //0 means real move
     updateBoard(myMove, color, 0, state);   
+    if(liveGame){
+	char moveCode[7];
+	transToChess(moveCode,myMove);
+	cout << moveCode;
+    }
 }
 
 
@@ -340,16 +364,65 @@ int transNum(char num){
 }
 //translates chess coords into matrix coords
 void translate(char *chess, move &myMove){
-	myMove.fromSquare.x = transNum(chess[1]);
-	myMove.fromSquare.y = transChar(chess[0]);
-	myMove.toSquare.x = transNum(chess[4]);
-	myMove.toSquare.y = transChar(chess[3]);
+	myMove.fromSquare.x = transNum(chess[2]);
+	myMove.fromSquare.y = transChar(chess[1]);
+	myMove.toSquare.x = transNum(chess[5]);
+	myMove.toSquare.y = transChar(chess[4]);
+}
+
+//translates matrix coord into chess coords
+void transToChess(char *moveCode, move &myMove){
+	moveCode[0] = '!';
+	moveCode[3] = '-';
+	moveCode[2] = transToChessNum(myMove.fromSquare.x);
+	moveCode[1] = transToChar(myMove.fromSquare.y);
+	moveCode[5] = transToChessNum(myMove.toSquare.x);
+	moveCode[4] = transToChar(myMove.toSquare.y);
+}
+
+
+//matrix coord to chess char
+char transToChar(int num){
+    switch(num){
+	case '0':
+	    return 'a';
+	case '1':
+	    return 'b';
+	case '2':
+	    return 'c';
+	case '3':
+	    return 'd';
+	case '4':
+	    return 'e';
+	default:
+	    return -1;
     }
+}
+
+//matrix coord to chess coord # 
+int transToChessNum(int num){
+    switch(num){
+	case '5':
+	    return 1;
+	case '4':
+	    return 2;
+	case '3':
+	    return 3;
+	case '2':
+	    return 4;
+	case '1':
+	    return 5;
+	case '0':
+	    return 6;
+	default:
+	    return -1;
+    }
+}
 
 //take human chess coordinates and make move
 void humanMove(char color){
-    char coord[6];
-    cout<< "please enter coorinates in format a1-a2";
+    char coord[7];
+    cout<< "please enter coorinates in format !a1-a2";
     cin >> coord;
     move myMove;
     translate(coord, myMove);
@@ -401,6 +474,31 @@ void createStart(states &state){
 	    (state).board[2][i] = 'x';
 	    (state).board[3][i] = 'x';
     }     
+}
+
+//take ref chess coordinates and make move
+void refInput(char color){
+    char coord[7];
+    cin >> coord;
+    move myMove;
+    translate(coord, myMove);
+    // 0 for real move
+    updateBoard(myMove, color, 0, mainState);   
+}
+
+void networkPlay(char myColor, states &state){
+    if(myColor == 'W'){
+	while(!gameEnd){
+	    compMove('W',state);
+	    refInput('B');        
+	}
+    }
+    else if (myColor == 'B'){
+	while(!gameEnd){
+	    compMove('B',state);
+	    refInput('W');        
+	}
+    }
 }
 
 void compVsComp(states &state){
