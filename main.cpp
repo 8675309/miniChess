@@ -21,6 +21,7 @@
   bool debug = false;  
   bool gameEnd = false;
   bool liveGame = true;
+  char winner;
   
   int main (){
       char myColor = 'W';
@@ -28,7 +29,7 @@
       networkPlay(myColor, mainState);
       
   //    compVsComp(mainState);
-      return 0;
+      return winner;
   }
   //checks to see if move passed to update board is valid
   bool validMove(move &myMove, char piece, char color,states &state){
@@ -94,14 +95,15 @@
   } 
 
   void gameOver(char color){
-      if(color == 'D')
-	cout << " Draw";
-      else if(color == 'E')
-	cout << " Game over. Ended due to Error";
-      else
-        cout <<  color << " wins \n";
       gameEnd = true;
       printBoard(mainState);
+      winner = color;
+      if(color == 'D')
+	cout << "  = Draw";
+      else if(color == 'E')
+	cout << "  = Game over. Ended due to Error";
+      else
+        cout <<  color << " =  wins \n";
       exit(0);
   }
   //1 test move, 0 actual move
@@ -487,17 +489,15 @@ void refInput(char color){
 }
 
 void networkPlay(char myColor, states &state){
-    if(myColor == 'W'){
-	while(!gameEnd){
+    while(!gameEnd){
+        if(myColor == 'W'){
 	    compMove('W',state);
 	    refInput('B');        
-	}
-    }
-    else if (myColor == 'B'){
-	while(!gameEnd){
+        }
+        else if (myColor == 'B'){
 	    compMove('B',state);
 	    refInput('W');        
-	}
+        }
     }
 }
 
