@@ -32,14 +32,41 @@
   bool liveGame;
   char winner;
   
-  int main (int argc, char** argv){
+
+//1queen 2knight 3bish 4rook 5py0 6py1 7py2 8py3 9py4 
+  int main (int argc, const char** argv){
       char myColor = 'W';
       createStart(mainState);
   //    networkPlay(myColor, mainState);
-      
       compVsComp(mainState);
+      #ifdef LEARN
+      queenv = *argv[1];
+      knightv = *argv[2];
+      bishv = *argv[3];
+      rookv = *argv[4];
+      py0v = *argv[5];
+      py1v = *argv[6];
+      py2v = *argv[7];
+      py3v = *argv[8];
+      py4v = *argv[9];
+      setPieceVaues();
+      #endif
       return winner;
   }
+
+  void setPieceValues(){
+    int pieceValues[9];
+    pieceValues[0] = queenv;
+    pieceValues[1] = knightv;
+    pieceValues[2]= bishv;
+    pieceValues[3] = rookv;
+    pieceValues[4] = py0v;
+    pieceValues[5] = py1v;
+    pieceValues[6] = py2v;
+    pieceValues[7] = py3v;
+    pieceValues[8] = py4v;
+  }
+
   //checks to see if move passed to update board is valid
   bool validMove(move &myMove, char piece, char color,states &state){
       //if we're playing a real game, don't validate
@@ -84,15 +111,12 @@
           default:
               cout<< "non-valid piece in pieces[i], states.cpp";
           }
-//changed from <= to <
           for(int i = 0; i < movesIndex; ++i){
               if(myFromX == moves[i].fromSquare.x && myFromY == moves[i].fromSquare.y){
                   if(myToX == moves[i].toSquare.x && myToY == moves[i].toSquare.y){
                       return true;
                   }
               }
-  //        cout << "i = " << i << '\n';
-
           }
       }  
        cout << "invalid move \n";
@@ -175,41 +199,6 @@ void undoMove(move &myMove, char savePiece,states &state){
     reverse.toSquare.x = myMove.fromSquare.x;
     reverse.toSquare.y = myMove.fromSquare.y;
     updateUndo(reverse, savePiece,state);   
-}
-
-move chooseMove(move *moves, char color, int count, states &state){
-    cout << "Choosing move " << color << '\n';
-    char opponent;
-    int i;
-    move myMove = moves[0];
-    if(color == 'W')
-	opponent = 'B';
-    else
-	opponent = 'W';
-
-    int bestScore = 10000;
-    int bestMove = 0;
-    int score;
-    for(i = 0; i < count; ++i){
-	//1 is for test move
-        char savePiece = (state).board[moves[i].toSquare.x][moves[i].toSquare.y];
-	updateBoard(moves[i],color,1,state);
-	score = (state).eval(opponent);
-	if(score < bestScore){
-	    bestScore = score;
-	    bestMove = i;
-	}
-	undoMove(moves[i], savePiece,state);
-    }
-    myMove = moves[bestMove];
-cout << "final chose move 179\n";
-cout << "from x " << myMove.fromSquare.x << "\n";
-cout << "from y " << myMove.fromSquare.y << "\n";
-cout << "to x " << myMove.toSquare.x << "\n";
-cout << "to y " << myMove.toSquare.y << "\n";
-cout << opponent << " " ;
-cout << (state).board[myMove.toSquare.x][myMove.toSquare.y] << " captured \n";
-    return myMove;
 }
  
 int pieceValue(char piece){
@@ -329,7 +318,6 @@ void compMove(char color, states &state){
     //0 means real move
     updateBoard(myMove, color, 0, state);   
     if(liveGame){
-cout<< "entered line 331 and shouldn't have if comp vs comp";
 	char moveCode[6];
 	transToChess(moveCode,myMove);
 	cout << moveCode;

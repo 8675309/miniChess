@@ -3,16 +3,17 @@
 #include "classes.h"
 #define single 1
 #define multiple 0
-   
-int queenV = 900;
-int knightV = 200;
-int bishV = 300;
-int rookV = 500;
-int py0V = 0;
-int py1V = 0;
-int py2V = 0;
-int py3V = 0;
-int py4V = 0;
+
+static int queenV = 900;
+static int knightV = 200;
+static int bishV = 300;
+static int rookV = 500;
+static int py0V = 0;
+static int py1V = 0;
+static int py2V = 0;
+static int py3V = 0;
+static int py4V = 0;
+
 
 int addPieces(int count,square *pieces);
 int eval(char color);
@@ -37,6 +38,19 @@ states& states::operator= (const states &original){
 	}
     }
     return *this;
+}
+
+//0queen 1knight 2bish 3rook 4py0 5py1 6py2 7py3 8py4 
+void states::setPieceValues(int pieceValues[9]){
+   queenV = pieceValues[0];
+   knightV = pieceValues[1];
+   bishV = pieceValues[2];
+   rookV = pieceValues[3];
+   py0V = pieceValues[4];
+   py1V = pieceValues[5];
+   py2V = pieceValues[6];
+   py3V = pieceValues[7];
+   py4V = pieceValues[8];
 }
 
 int states::inBounds(int x, int y){

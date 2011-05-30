@@ -27,6 +27,7 @@ class states{
         int addPieces(int count, square *pieces);
 	int findPieces(char color, square *pieces);
 	void scan(int x, int y, move *moves, int &movesIndex, int dx, int dy, int single, char color);
+        void setPieceValues(int pieceValues[9]);
 	void checkNSEW(int x, int y, move *moves, int &movesIndex, int single, char color);
 	void checkDiag(int x, int y, move *moves, int &movesIndex, int single, char color);
 	void queenMoves(int x, int y, move *moves, int &movesIndex, char color);
