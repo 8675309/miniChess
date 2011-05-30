@@ -1,10 +1,24 @@
 //Jennifer Solman hw1
-
+#define LEARNED
 #include "classes.h"
 #define single 1
 #define multiple 0
+   
+int queenV = 900;
+int knightV = 200;
+int bishV = 300;
+int rookV = 500;
+int py0V = 0;
+int py1V = 0;
+int py2V = 0;
+int py3V = 0;
+int py4V = 0;
+
 int addPieces(int count,square *pieces);
 int eval(char color);
+int addLearnedPieces(int count,square *pieces);
+
+
 states::states(){
     onMove = 'W';
     count = 0;
@@ -97,8 +111,23 @@ int states::eval(char color){
     int countB = findPieces('B',piecesB);
     int countW = findPieces('W',piecesW);
     int totalB, totalW;
-    totalB = addPieces(countB,piecesB);
-    totalW = addPieces(countW,piecesW);
+
+    #ifdef LEARN
+    if(color == 'B'){
+       totalB = addPieces(countB,piecesB);
+       totalW = addPieces(countW,piecesW);
+    }
+    else{
+       totalB = addLearnPieces(countB,piecesB);
+       totalW = addLearnPieces(countW,piecesW);
+    }
+    #endif
+
+    #ifndef LEARN
+       totalB = addPieces(countB,piecesB);
+       totalW = addPieces(countW,piecesW);
+    #endif
+
     int score;
     if(color == 'W')
 	 score = totalW - totalB;
@@ -108,9 +137,91 @@ int states::eval(char color){
     return score; 
 }
 
+//white gets values here when evaluator is learning 
+int states::addLearnedPieces(int count,square *pieces){
+    int score = 0;
+    for(int i = 0; i < count; ++i){
+		switch(board[pieces[i].x][pieces[i].y]){
+			case 'k':
+			case 'K':
+				score += 10000;
+				break;
+			case 'q':
+			case 'Q':
+				score += queenV;
+				break;
+			case 'r':
+			case 'R':
+				score += rookV;
+				break;
+			case 'b':
+			case 'B':
+				score += bishV;
+				break;
+			case 'n':
+			case 'N':
+				score += knightV;
+				break;
+			case 'P':
+				int y = pieces[i].y;
+				int x = pieces[i].x;
+				if(y == 0)
+				    score += py0V;
+				else if(y == 1)
+				    score += py1V;
+				else if(y == 2)
+				    score += py2V;
+				else if(y == 3)
+				    score += py3V;
+				else if(y == 4)
+				    score += py4V;
+
+				if(x == 4)
+				    score += 200;
+				else if(x == 3)
+				    score += 400;
+				else if(x == 2)
+				    score += 500;
+				else if(x == 1)
+				    score += 600;
+				else if(x == 0)
+				    score += 900;
+				break;
+			case 'p':
+			        y = pieces[i].y;
+				x = pieces[i].x;
+				if(y == 0)
+				    score += py0V;
+				else if(y == 1)
+				    score += py1V;
+				else if(y == 2)
+				    score += py2V;
+				else if(y == 3)
+				    score += py3V;
+				else if(y == 4)
+				    score += py4V;
+
+				if(x == 1)
+				    score += 200;
+				else if(x == 2)
+				    score += 400;
+				else if(x == 3)
+				    score += 500;
+				else if(x == 4)
+				    score += 600;
+				else if(x == 5)
+				    score += 900;
+				break;
+			default:
+				cout<< "120 non-valid piece in pieces[i], states.cpp \n";
+		}
+	}
+	return score;
+}
+
+//this is default piece values. Black uses these always
 int states::addPieces(int count,square *pieces){
     int score = 0;
-//changed from <=...
     for(int i = 0; i < count; ++i){
 		switch(board[pieces[i].x][pieces[i].y]){
 			case 'k':
@@ -125,6 +236,7 @@ int states::addPieces(int count,square *pieces){
 			case 'R':
 				score += 500;
 				break;
+
 			case 'b':
 			case 'B':
 				score += 300;
@@ -147,7 +259,7 @@ int states::addPieces(int count,square *pieces){
 				    score += 900;
 				break;
 			case 'p':
-				x = pieces[i].x;
+			        x = pieces[i].x;
 				if(x == 1)
 				    score += 200;
 				else if(x == 2)
@@ -178,12 +290,10 @@ void states::scan(int x, int y, move *moves, int &movesIndex, int dx, int dy, in
 	    moves[movesIndex].toSquare.x = toX + dx; 
 	    moves[movesIndex].toSquare.y = toY + dy;
 	    if(CE == 1 || movement == single){
-//cout<< "\nsingle or opponent break\n" ;
 		++movesIndex;
 		break;
             }
 	    else{ 
-//cout<< "\nsearch farther\n" ;
 	        toX = toX + dx;
                 toY = toY + dy;
 		++movesIndex;

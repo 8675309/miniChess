@@ -37,6 +37,7 @@ class states{
 	void wPawnMoves(int x, int y, move *moves, int &movesIndex);
 	void bPawnMoves(int x, int y, move *moves, int &movesIndex);
 	void pawnAttacks(int x, int y, move *moves, int &movesIndex, int dx, int dy, char color);
+        int addLearnedPieces(int count,square *pieces);
         char board[6][5];
         char onMove;
         int count;

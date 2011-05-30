@@ -1,5 +1,14 @@
   //Jennifer Solman hw1
-  
+   int queenv = 900;
+   int knightv = 200;
+   int bishv = 300;
+   int rookv = 500;
+   int py0v = 0;
+   int py1v = 0;
+   int py2v = 0;
+   int py3v = 0;
+   int py4v = 0;
+
   #include "classes.h"
   #include <cstdlib>
   #include <time.h>
@@ -20,15 +29,15 @@
   //set this to false during a real game
   bool debug = false;  
   bool gameEnd = false;
-  bool liveGame = true;
+  bool liveGame;
   char winner;
   
-  int main (){
+  int main (int argc, char** argv){
       char myColor = 'W';
       createStart(mainState);
-      networkPlay(myColor, mainState);
+  //    networkPlay(myColor, mainState);
       
-  //    compVsComp(mainState);
+      compVsComp(mainState);
       return winner;
   }
   //checks to see if move passed to update board is valid
@@ -310,7 +319,7 @@ void compMove(char color, states &state){
     int count = (state).moveGen(color, moves);
     if(count==0)
     {
-      cout << "in if 149:no possible moves \n";
+      cout << "in if 320:no possible moves \n";
 	if(color == 'W')
 	       gameOver('B');
 	else
@@ -320,7 +329,8 @@ void compMove(char color, states &state){
     //0 means real move
     updateBoard(myMove, color, 0, state);   
     if(liveGame){
-	char moveCode[7];
+cout<< "entered line 331 and shouldn't have if comp vs comp";
+	char moveCode[6];
 	transToChess(moveCode,myMove);
 	cout << moveCode;
     }
@@ -426,6 +436,7 @@ void humanMove(char color){
     char coord[7];
     cout<< "please enter coorinates in format !a1-a2";
     cin >> coord;
+    cin.ignore(100, '\n');
     move myMove;
     translate(coord, myMove);
     // 0 for real move
@@ -480,8 +491,9 @@ void createStart(states &state){
 
 //take ref chess coordinates and make move
 void refInput(char color){
-    char coord[7];
+    char coord[6];
     cin >> coord;
+    cin.ignore(100, '\n');
     move myMove;
     translate(coord, myMove);
     // 0 for real move
@@ -489,6 +501,8 @@ void refInput(char color){
 }
 
 void networkPlay(char myColor, states &state){
+cout<< "entered network play";
+    liveGame = true;
     while(!gameEnd){
         if(myColor == 'W'){
 	    compMove('W',state);
@@ -502,6 +516,8 @@ void networkPlay(char myColor, states &state){
 }
 
 void compVsComp(states &state){
+cout<< "entered compVcomp";
+    liveGame = false;
   while(1){
     compMove('W',state);
 //    state.eval('W');
