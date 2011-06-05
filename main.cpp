@@ -39,20 +39,11 @@
       createStart(mainState);
   //    networkPlay(myColor, mainState);
       compVsComp(mainState);
-      #ifdef LEARN
-      queenv = *argv[1];
-      knightv = *argv[2];
-      bishv = *argv[3];
-      rookv = *argv[4];
-      py0v = *argv[5];
-      py1v = *argv[6];
-      py2v = *argv[7];
-      py3v = *argv[8];
-      py4v = *argv[9];
-      setPieceVaues();
-      #endif
       return winner;
   }
+
+
+
 
   void setPieceValues(){
     int pieceValues[9];
@@ -65,6 +56,7 @@
     pieceValues[6] = py2v;
     pieceValues[7] = py3v;
     pieceValues[8] = py4v;
+    mainState.setPieceValues(pieceValues);
   }
 
   //checks to see if move passed to update board is valid
