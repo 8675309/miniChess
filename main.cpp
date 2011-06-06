@@ -1,4 +1,10 @@
   //Jennifer Solman hw1
+  #include "classes.h"
+  #include <cstdlib>
+  #include <time.h>
+  #include <algorithm>
+  #include <fstream>
+  using namespace std;
    int queenv = 900;
    int knightv = 200;
    int bishv = 300;
@@ -8,45 +14,109 @@
    int py2v = 0;
    int py3v = 0;
    int py4v = 0;
-
-  #include "classes.h"
-  #include <cstdlib>
-  #include <time.h>
-  #include <algorithm>
-  void gameOver(char color);
+   int seconds = 2;
+  bool endGame;
+  int gameOver(char color);
   void createStart(states &state);
   void readBoard();
   void printBoard(states &state);
   void compVsComp(states &state);
-  //int negamax(states myState, int depth, int alpha, int beta, int turn, int color);
   int colorMatch(move &myMove, char piece, char color);
   int negamax(states &myState, int depth, int alpha, int beta, char color,int time);
   int transToChessNum(int num);
   void transToChess(char *moveCode, move &myMove);
   char transToChar(int num);
   void networkPlay(char myColor,states &mainState);
+  char run();
+  void setPieceValues(int pieceValues[9]);
+  void setToStandard();
   states mainState;
   //set this to false during a real game
   bool debug = false;  
-  bool gameEnd = false;
   bool liveGame;
   char winner;
+  int numRuns = 25;
   
-
-//1queen 2knight 3bish 4rook 5py0 6py1 7py2 8py3 9py4 
   int main (int argc, const char** argv){
-      char myColor = 'W';
+    fstream myfile;
+    int pieceVals[9];
+    myfile.open ("chessData.txt");
+    myfile << " 0 queen, 1 knight, 2 bish, 3 rook, 4 py0, 5 py1, 6 py2, 7 py3, 8 py4 \n"; 
+    myfile.close();
+    int bestValue;
+    int testValue;
+    int bestW;
+    int tempW;
+    int origW = 0;
+  
+  for(int j = 0; j < numRuns; ++j){ 
+        char result = run();
+	if(result == 'W')
+	    ++origW;	   
+    }   
+  myfile.open ("chessData.txt");
+  myfile << " \n white normally wins " << origW << " of " << numRuns; 
+  myfile.close();
+    
+     //for each piece
+     for(int i = 0; i < 9; ++i){
+	setToStandard();
+	setPieceValues(pieceVals);
+	bestValue = pieceVals[i];
+	testValue = -200;
+	bestW = origW;
+        tempW = 0;
+        //play numRuns games and see if we win more for each test value
+	while(testValue <= 900){
+cout << "\n test value " << testValue << "\n";
+	    time_t sec;
+	    time(&sec);
+	    srand((unsigned int)sec);
+	    //seconds = (rand() % 7) + 1;
+	    pieceVals[i] = testValue;
+            mainState.setPieceValues(pieceVals);
+            for(int j = 0; j < numRuns; ++j){ 
+        	char result = run();
+		if(result == 'W')
+	           ++tempW;	   
+            }
+            if(tempW > bestW){
+		bestW = tempW;
+		bestValue = testValue;
+	    }   
+	    testValue += 100;
+	}
+        //set value of that piece to best value
+ 	myfile.open ("chessData.txt");
+	myfile << "\n piece number " << i << " best value: " << bestValue << "\n won: " << bestW << " of " << numRuns;
+        myfile.close();
+     }
+
+    return 0;
+}
+
+char run(){
+      endGame = false;
       createStart(mainState);
-  //    networkPlay(myColor, mainState);
       compVsComp(mainState);
       return winner;
-  }
+}
+
+//resets pieces before next evaluation run
+void setToStandard(){
+    queenv = 900;
+    knightv = 200;
+    bishv = 300;
+    rookv = 500;
+    py0v = 0;
+    py1v = 0;
+    py2v = 0;
+    py3v = 0;
+    py4v = 0;
+}
 
 
-
-
-  void setPieceValues(){
-    int pieceValues[9];
+  void setPieceValues(int pieceValues[9]){
     pieceValues[0] = queenv;
     pieceValues[1] = knightv;
     pieceValues[2]= bishv;
@@ -56,7 +126,6 @@
     pieceValues[6] = py2v;
     pieceValues[7] = py3v;
     pieceValues[8] = py4v;
-    mainState.setPieceValues(pieceValues);
   }
 
   //checks to see if move passed to update board is valid
@@ -119,8 +188,8 @@
        return false;
   } 
 
-  void gameOver(char color){
-      gameEnd = true;
+  int gameOver(char color){
+      endGame = true;
       printBoard(mainState);
       winner = color;
       if(color == 'D')
@@ -129,8 +198,9 @@
 	cout << "  = Game over. Ended due to Error";
       else
         cout <<  color << " =  wins \n";
-      exit(0);
+      return 0;
   }
+
   //1 test move, 0 actual move
   void updateBoard(move &myMove, char color,bool test, states &state){
       int myFromX = myMove.fromSquare.x;
@@ -257,7 +327,6 @@ move chooseMove2(move *moves, char color, int count, states &state){
     int value = state.eval(color);
     shuffle(moves,count);
     sortMoves(moves, count, state, value);
-    int seconds = 5;
     int time = clock() + seconds*CLOCKS_PER_SEC;
     cout << "Choosing move via negamax " << color << '\n';
     move myMove = moves[0];
@@ -270,6 +339,8 @@ move chooseMove2(move *moves, char color, int count, states &state){
     int bestMove = 0;
     int score;
   while(clock() < time){
+    if(count == 0)
+	break;
     for(i = 0; i < count; ++i){
         char savePiece = (state).board[moves[i].toSquare.x][moves[i].toSquare.y];
 	updateBoard(moves[i],color,test,state);
@@ -283,28 +354,29 @@ move chooseMove2(move *moves, char color, int count, states &state){
     cout<< " finished depth " << depth << '\n';
     ++depth;
  }
+
     myMove = moves[bestMove];
-cout << "final chose move 214\n";
-cout << "from x " << myMove.fromSquare.x << "\n";;
-cout << "from y " << myMove.fromSquare.y << "\n";;
-cout << "to x " << myMove.toSquare.x << "\n";;
-cout << "to y " << myMove.toSquare.y << "\n";;
+//cout << "final chose move 214\n";
+//cout << "from x " << myMove.fromSquare.x << "\n";;
+//cout << "from y " << myMove.fromSquare.y << "\n";;
+//cout << "to x " << myMove.toSquare.x << "\n";;
+//cout << "to y " << myMove.toSquare.y << "\n";;
 cout << opponent << " " ;
 cout << (state).board[myMove.toSquare.x][myMove.toSquare.y] << " captured \n";
     return myMove;
 }
 
 //generates random computer move
-void compMove(char color, states &state){
+int compMove(char color, states &state){
     move moves[290];
     int count = (state).moveGen(color, moves);
-    if(count==0)
-    {
+    if(count==0){
       cout << "in if 320:no possible moves \n";
 	if(color == 'W')
 	       gameOver('B');
 	else
 	       gameOver('W');
+      return 0;
     }
     move myMove = chooseMove2(moves,color,count,state);
     //0 means real move
@@ -314,6 +386,7 @@ void compMove(char color, states &state){
 	transToChess(moveCode,myMove);
 	cout << moveCode;
     }
+    return 1;
 }
 
 
@@ -411,18 +484,6 @@ int transToChessNum(int num){
     }
 }
 
-//take human chess coordinates and make move
-void humanMove(char color){
-    char coord[7];
-    cout<< "please enter coorinates in format !a1-a2";
-    cin >> coord;
-    cin.ignore(100, '\n');
-    move myMove;
-    translate(coord, myMove);
-    // 0 for real move
-    updateBoard(myMove, color, 0, mainState);   
-}
-
 void printBoard( states &state){
     int i,j;
     for(i=0; i<=5; ++i){
@@ -432,21 +493,6 @@ void printBoard( states &state){
 	cout << "\n" ;
     }
     cout << '\n' << '\n';
-}
-
-void readBoard(){
-    cin >> mainState.count >> mainState.onMove;
-    char newState[36];
-    cin >> newState;
-    int i,j;
-    int k=0;
-    for(i=0; i<=5; ++i){
-	for(j=0; j<=4; ++j){
-	    mainState.board[i][j] = newState[k];
-	    ++k;
-	}
-	++k; //skip the newline in input
-    }
 }
 
 void createStart(states &state){
@@ -467,32 +513,6 @@ void createStart(states &state){
 	    (state).board[2][i] = 'x';
 	    (state).board[3][i] = 'x';
     }     
-}
-
-//take ref chess coordinates and make move
-void refInput(char color){
-    char coord[6];
-    cin >> coord;
-    cin.ignore(100, '\n');
-    move myMove;
-    translate(coord, myMove);
-    // 0 for real move
-    updateBoard(myMove, color, 0, mainState);   
-}
-
-void networkPlay(char myColor, states &state){
-cout<< "entered network play";
-    liveGame = true;
-    while(!gameEnd){
-        if(myColor == 'W'){
-	    compMove('W',state);
-	    refInput('B');        
-        }
-        else if (myColor == 'B'){
-	    compMove('B',state);
-	    refInput('W');        
-        }
-    }
 }
 
 void compVsComp(states &state){
