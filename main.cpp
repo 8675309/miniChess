@@ -37,7 +37,7 @@
   bool liveGame;
   char winner;
  /////////////////////////////////////////////////TEST!
-  int numRuns = 2;
+  int numRuns = 25;
   
   int main (int argc, const char** argv){
     ofstream myfile;
@@ -47,24 +47,26 @@
     myfile.close();
     int bestValue;
     int testValue;
+    int stdPieceVal;
     int bestW;
     int tempW;
-    int origW = 0;
+    int origW = 10;
   
   //for(int j = 0; j < numRuns; ++j){ 
-    //    char result = run();
+  //      char result = run();
 //	if(result == 'W')
 //	    ++origW;	   
-  //  }   
+  //}   
   myfile.open ("chessData.txt", ios::out | ios::app );
   myfile << " \n white normally wins " << origW << " of " << numRuns << "\n"; 
   myfile.close();
-    
+  
      //for each piece
 //////////////////////////////////////////////TEST!
-     for(int i = 0; i < 2; ++i){
+     for(int i = 0; i < 9; ++i){
 	setToStandard();
 	setPieceValues(pieceVals);
+        stdPieceVal = pieceVals[i];
 	bestValue = pieceVals[i];
 	testValue = -100;
 	bestW = origW;
@@ -72,11 +74,7 @@
         //play numRuns games and see if we win more for each test value
 //////////////////////////////////////////////////TEST!
 	while(testValue <= 0){
-cout << "\n test value " << testValue << "\n";
-//	    time_t sec;
-//	    time(&sec);
-//	    srand((unsigned int)sec);
-//	    seconds = (rand() % 7) + 1;
+         if(testValue != stdPieceVal){
 	    pieceVals[i] = testValue;
             mainState.setPieceValues(pieceVals);
             for(int j = 0; j < numRuns; ++j){ 
@@ -84,15 +82,17 @@ cout << "\n test value " << testValue << "\n";
 		if(result == 'W')
 	           ++tempW;	   
             }
- 	myfile.open ("chessData.txt", ios::out | ios::app);
-	myfile << "\n piece number " << i << " test value: " << testValue << "\n won: " << tempW << " of " << numRuns;
-        myfile.close();
+ 	    myfile.open ("chessData.txt", ios::out | ios::app);
+	    myfile << "\n piece number " << i << " test value: " << testValue << "\n won: " << tempW << " of " << numRuns;
+            myfile.close();
             if(tempW > bestW){
 		bestW = tempW;
 		bestValue = testValue;
-	    }   
+	    }
+         }
 	    testValue += 100;
 	}
+
         //set value of that piece to best value
  	myfile.open ("chessData.txt", ios::out | ios::app);
 	myfile << "\n ************piece number " << i << " best value: " << bestValue << "\n won: " << bestW << " of " << numRuns;
@@ -545,10 +545,10 @@ void compVsComp(states &state){
   while(!endGame){
     compMove('W',state);
 //    state.eval('W');
-    printBoard(state);
+//    printBoard(state);
     compMove('B',state);
 //    state.eval('B');
-    printBoard(state);
+//    printBoard(state);
   }
 }
 
