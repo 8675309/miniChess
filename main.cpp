@@ -14,9 +14,9 @@
    int py2v = 0;
    int py3v = 0;
    int py4v = 0;
-   int seconds = 2;
+   int seconds = 1;
   bool endGame;
-  int gameOver(char color);
+  void gameOver(char color);
   void createStart(states &state);
   void readBoard();
   void printBoard(states &state);
@@ -35,7 +35,8 @@
   bool debug = false;  
   bool liveGame;
   char winner;
-  int numRuns = 25;
+ /////////////////////////////////////////////////TEST!
+  int numRuns = 2;
   
   int main (int argc, const char** argv){
     fstream myfile;
@@ -54,12 +55,13 @@
 	if(result == 'W')
 	    ++origW;	   
     }   
-  myfile.open ("chessData.txt");
+  myfile.open ("chessData.txt", ios::app);
   myfile << " \n white normally wins " << origW << " of " << numRuns; 
   myfile.close();
     
      //for each piece
-     for(int i = 0; i < 9; ++i){
+//////////////////////////////////////////////TEST!
+     for(int i = 0; i < 2; ++i){
 	setToStandard();
 	setPieceValues(pieceVals);
 	bestValue = pieceVals[i];
@@ -80,6 +82,9 @@ cout << "\n test value " << testValue << "\n";
 		if(result == 'W')
 	           ++tempW;	   
             }
+ 	myfile.open ("chessData.txt", ios::app);
+	myfile << "\n piece number " << i << " test value: " << testValue << "\n won: " << tempW << " of " << numRuns;
+        myfile.close();
             if(tempW > bestW){
 		bestW = tempW;
 		bestValue = testValue;
@@ -87,7 +92,7 @@ cout << "\n test value " << testValue << "\n";
 	    testValue += 100;
 	}
         //set value of that piece to best value
- 	myfile.open ("chessData.txt");
+ 	myfile.open ("chessData.txt", ios::app);
 	myfile << "\n piece number " << i << " best value: " << bestValue << "\n won: " << bestW << " of " << numRuns;
         myfile.close();
      }
@@ -188,7 +193,7 @@ void setToStandard(){
        return false;
   } 
 
-  int gameOver(char color){
+  void gameOver(char color){
       endGame = true;
       printBoard(mainState);
       winner = color;
@@ -198,7 +203,7 @@ void setToStandard(){
 	cout << "  = Game over. Ended due to Error";
       else
         cout <<  color << " =  wins \n";
-      return 0;
+      return;
   }
 
   //1 test move, 0 actual move
@@ -214,6 +219,7 @@ void setToStandard(){
             (state).board[myToX][myToY] = piece;
             printBoard(state);
 	    gameOver(color);
+            return;
         }
         //if test == zero and pawn reaches other side, promote to queen
 	if(color == 'W' && test == 0 && piece == 'P' && myToX == 0 ){
@@ -225,8 +231,10 @@ void setToStandard(){
 	(state).board[myToX][myToY] = piece;
 	if(test == 0)
 	    ++((state).count);
-	if(state.count >= 80){
+	if(state.count >= 80 && test == 0){
 	    gameOver('D');
+            state.count = 0;
+            return;
 	}
     }
     else
@@ -339,9 +347,11 @@ move chooseMove2(move *moves, char color, int count, states &state){
     int bestMove = 0;
     int score;
   while(clock() < time){
-    if(count == 0)
+    if(count == 0 || endGame)
 	break;
     for(i = 0; i < count; ++i){
+        if(endGame)
+	   break;
         char savePiece = (state).board[moves[i].toSquare.x][moves[i].toSquare.y];
 	updateBoard(moves[i],color,test,state);
 	score = -negamax(state, depth, alpha, beta, opponent,time);
@@ -367,7 +377,7 @@ cout << (state).board[myMove.toSquare.x][myMove.toSquare.y] << " captured \n";
 }
 
 //generates random computer move
-int compMove(char color, states &state){
+void compMove(char color, states &state){
     move moves[290];
     int count = (state).moveGen(color, moves);
     if(count==0){
@@ -376,8 +386,10 @@ int compMove(char color, states &state){
 	       gameOver('B');
 	else
 	       gameOver('W');
-      return 0;
+      return;
     }
+   if(endGame)
+        return;
     move myMove = chooseMove2(moves,color,count,state);
     //0 means real move
     updateBoard(myMove, color, 0, state);   
@@ -386,7 +398,6 @@ int compMove(char color, states &state){
 	transToChess(moveCode,myMove);
 	cout << moveCode;
     }
-    return 1;
 }
 
 
@@ -516,9 +527,8 @@ void createStart(states &state){
 }
 
 void compVsComp(states &state){
-cout<< "entered compVcomp";
     liveGame = false;
-  while(1){
+  while(!endGame){
     compMove('W',state);
 //    state.eval('W');
     printBoard(state);
