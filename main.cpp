@@ -57,7 +57,7 @@
 //	    ++origW;	   
   //  }   
   myfile.open ("chessData.txt", ios::out | ios::app );
-  myfile << " \n white normally wins " << origW << " of " << numRuns; 
+  myfile << " \n white normally wins " << origW << " of " << numRuns << "\n"; 
   myfile.close();
     
      //for each piece
@@ -96,6 +96,7 @@ cout << "\n test value " << testValue << "\n";
         //set value of that piece to best value
  	myfile.open ("chessData.txt", ios::out | ios::app);
 	myfile << "\n ************piece number " << i << " best value: " << bestValue << "\n won: " << bestW << " of " << numRuns;
+        myfile << "\n \n";
         myfile.close();
      }
 
@@ -378,7 +379,7 @@ move chooseMove2(move *moves, char color, int count, states &state){
     return myMove;
 }
 
-//generates random computer move
+//generates a computer move
 void compMove(char color, states &state){
     move moves[290];
     int count = (state).moveGen(color, moves);
@@ -395,13 +396,18 @@ void compMove(char color, states &state){
     move myMove = chooseMove2(moves,color,count,state);
     //0 means real move
     updateBoard(myMove, color, 0, state);   
-    if(liveGame){
-	char moveCode[6];
-	transToChess(moveCode,myMove);
-	cout << moveCode;
-    }
 }
 
+void randomCompMove(char color, states &state){
+    move moves[290];
+    int i = state.moveGen(color, moves);
+    time_t seconds;
+    time(&seconds);
+    srand((unsigned int) seconds) ; 
+    int random = rand() % i;
+    move myMove = moves[random];
+    updateBoard(myMove, color, 0, state);   
+}
 
 //chess coord char to matrix coord
 int transChar(char letter){
@@ -530,6 +536,12 @@ void createStart(states &state){
 
 void compVsComp(states &state){
     liveGame = false;
+    randomCompMove('W',state);
+    randomCompMove('B',state);
+    randomCompMove('W',state);
+    randomCompMove('B',state);
+    randomCompMove('W',state);
+    randomCompMove('B',state);
   while(!endGame){
     compMove('W',state);
 //    state.eval('W');
