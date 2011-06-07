@@ -4,6 +4,7 @@
   #include <time.h>
   #include <algorithm>
   #include <fstream>
+  #include <iostream>
   using namespace std;
    int queenv = 900;
    int knightv = 200;
@@ -39,7 +40,7 @@
   int numRuns = 2;
   
   int main (int argc, const char** argv){
-    fstream myfile;
+    ofstream myfile;
     int pieceVals[9];
     myfile.open ("chessData.txt");
     myfile << " 0 queen, 1 knight, 2 bish, 3 rook, 4 py0, 5 py1, 6 py2, 7 py3, 8 py4 \n"; 
@@ -50,12 +51,12 @@
     int tempW;
     int origW = 0;
   
-  for(int j = 0; j < numRuns; ++j){ 
-        char result = run();
-	if(result == 'W')
-	    ++origW;	   
-    }   
-  myfile.open ("chessData.txt", ios::app);
+  //for(int j = 0; j < numRuns; ++j){ 
+    //    char result = run();
+//	if(result == 'W')
+//	    ++origW;	   
+  //  }   
+  myfile.open ("chessData.txt", ios::out | ios::app );
   myfile << " \n white normally wins " << origW << " of " << numRuns; 
   myfile.close();
     
@@ -65,16 +66,17 @@
 	setToStandard();
 	setPieceValues(pieceVals);
 	bestValue = pieceVals[i];
-	testValue = -200;
+	testValue = -100;
 	bestW = origW;
         tempW = 0;
         //play numRuns games and see if we win more for each test value
-	while(testValue <= 900){
+//////////////////////////////////////////////////TEST!
+	while(testValue <= 0){
 cout << "\n test value " << testValue << "\n";
-	    time_t sec;
-	    time(&sec);
-	    srand((unsigned int)sec);
-	    //seconds = (rand() % 7) + 1;
+//	    time_t sec;
+//	    time(&sec);
+//	    srand((unsigned int)sec);
+//	    seconds = (rand() % 7) + 1;
 	    pieceVals[i] = testValue;
             mainState.setPieceValues(pieceVals);
             for(int j = 0; j < numRuns; ++j){ 
@@ -82,7 +84,7 @@ cout << "\n test value " << testValue << "\n";
 		if(result == 'W')
 	           ++tempW;	   
             }
- 	myfile.open ("chessData.txt", ios::app);
+ 	myfile.open ("chessData.txt", ios::out | ios::app);
 	myfile << "\n piece number " << i << " test value: " << testValue << "\n won: " << tempW << " of " << numRuns;
         myfile.close();
             if(tempW > bestW){
@@ -92,8 +94,8 @@ cout << "\n test value " << testValue << "\n";
 	    testValue += 100;
 	}
         //set value of that piece to best value
- 	myfile.open ("chessData.txt", ios::app);
-	myfile << "\n piece number " << i << " best value: " << bestValue << "\n won: " << bestW << " of " << numRuns;
+ 	myfile.open ("chessData.txt", ios::out | ios::app);
+	myfile << "\n ************piece number " << i << " best value: " << bestValue << "\n won: " << bestW << " of " << numRuns;
         myfile.close();
      }
 
@@ -195,14 +197,14 @@ void setToStandard(){
 
   void gameOver(char color){
       endGame = true;
-      printBoard(mainState);
+      //printBoard(mainState);
       winner = color;
-      if(color == 'D')
-	cout << "  = Draw";
-      else if(color == 'E')
-	cout << "  = Game over. Ended due to Error";
-      else
-        cout <<  color << " =  wins \n";
+     // if(color == 'D')
+//	cout << "  = Draw";
+  //    else if(color == 'E')
+//	cout << "  = Game over. Ended due to Error";
+  //    else
+    //    cout <<  color << " =  wins \n";
       return;
   }
 
@@ -217,7 +219,7 @@ void setToStandard(){
         (state).board[myFromX][myFromY] = 'x';
 	if(test == 0 &&((state).board[myToX][myToY] == 'k' || (state).board[myToX][myToY] == 'K')){   
             (state).board[myToX][myToY] = piece;
-            printBoard(state);
+          //  printBoard(state);
 	    gameOver(color);
             return;
         }
@@ -336,7 +338,7 @@ move chooseMove2(move *moves, char color, int count, states &state){
     shuffle(moves,count);
     sortMoves(moves, count, state, value);
     int time = clock() + seconds*CLOCKS_PER_SEC;
-    cout << "Choosing move via negamax " << color << '\n';
+    //cout << "Choosing move via negamax " << color << '\n';
     move myMove = moves[0];
     if(color == 'W')
 	opponent = 'B';
@@ -361,7 +363,7 @@ move chooseMove2(move *moves, char color, int count, states &state){
 	}
 	undoMove(moves[i], savePiece,state);
    }
-    cout<< " finished depth " << depth << '\n';
+  //  cout<< " finished depth " << depth << '\n';
     ++depth;
  }
 
@@ -371,8 +373,8 @@ move chooseMove2(move *moves, char color, int count, states &state){
 //cout << "from y " << myMove.fromSquare.y << "\n";;
 //cout << "to x " << myMove.toSquare.x << "\n";;
 //cout << "to y " << myMove.toSquare.y << "\n";;
-cout << opponent << " " ;
-cout << (state).board[myMove.toSquare.x][myMove.toSquare.y] << " captured \n";
+//cout << opponent << " " ;
+//cout << (state).board[myMove.toSquare.x][myMove.toSquare.y] << " captured \n";
     return myMove;
 }
 
@@ -381,7 +383,7 @@ void compMove(char color, states &state){
     move moves[290];
     int count = (state).moveGen(color, moves);
     if(count==0){
-      cout << "in if 320:no possible moves \n";
+  //    cout << "in if 320:no possible moves \n";
 	if(color == 'W')
 	       gameOver('B');
 	else
