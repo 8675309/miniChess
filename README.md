@@ -4,7 +4,7 @@ This miniChess bot was created for an AI course I took a Portland State back in 
 
 Final Project Write Up
 
-	This  write up is designed for easy grading of the project. Starting with lesson 6 on the tutorial it tells you where to find the code and gives a basic description of my implementation (everything before lesson 6 is basic to getting started.):
+This  write up is designed for easy grading of the project. Starting with lesson 6 on the tutorial it tells you where to find the code and gives a basic description of my implementation (everything before lesson 6 is basic to getting started.):
 
 6) Build a mini chess state evaluator:
 	states.cpp line 94. I create an array of 10 for white and black to hold all possible pieces on the board. findPieces(color, square *) fills this array and returns an int stating how may pieces it placed in the array. addPieces(int, square *) adds up the values of each of the pieces. One score is subtracted from the other. The result is returned. 
